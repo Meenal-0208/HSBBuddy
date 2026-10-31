@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.db.init_db import init_db
-from app.api import materials
+from app.api import materials, notes, quizzes
 
 settings = get_settings()
 
@@ -27,6 +27,8 @@ def on_startup():
 
 # Include Routers
 app.include_router(materials.router)
+app.include_router(notes.router)
+app.include_router(quizzes.router)
 
 @app.get("/api/health")
 def health_check():

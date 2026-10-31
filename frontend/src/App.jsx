@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Materials from './pages/Materials';
@@ -7,213 +7,246 @@ import ShortNotes from './pages/ShortNotes';
 import Quiz from './pages/Quiz';
 import Results from './pages/Results';
 import Progress from './pages/Progress';
+
+import { 
+  fetchHealth, 
+  fetchMaterials, 
+  uploadMaterial, 
+  deleteMaterial, 
+  fetchNotes, 
+  generateNotes, 
+  generateQuiz, 
+  submitQuizAnswers, 
+  fetchProgress 
+} from './api/client';
 import { MOCK_DATA } from './mockData';
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard');
-  const [data, setData] = useState(MOCK_DATA);
-  const [selectedMaterial, setSelectedMaterial] = useState(data.materials[0]);
-  const [activeQuiz, setActiveQuiz] = useState(data.sampleQuiz);
+  const [subjectName, setSubjectName] = useState("HSB 101: Human Structural Biology");
+  const [aiConfigured, setAiConfigured] = useState(false);
+  const [materials, setMaterials] = useState([]);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [notesData, setNotesData] = useState({});
+  const [activeQuiz, setActiveQuiz] = useState(null);
   const [latestResult, setLatestResult] = useState(null);
+  const [progressData, setProgressData] = useState({
+    recent_attempts: [],
+    revision_items: [],
+    stats: {
+      materialsCount: 0,
+      notesGenerated: 0,
+      quizzesCompleted: 0,
+      averageScore: 0,
+      revisionTopicsCount: 0
+    }
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [errorToast, setErrorToast] = useState(null);
+
+  const showError = (msg) => {
+    setErrorToast(msg);
+    setTimeout(() => setErrorToast(null), 5000);
+  };
+
+  // Initial Load from Backend
+  const loadInitialData = async () => {
+    try {
+      const health = await fetchHealth();
+      if (health.subject_name) setSubjectName(health.subject_name);
+      setAiConfigured(health.ai_configured);
+
+      const mats = await fetchMaterials();
+      if (mats && mats.length > 0) {
+        setMaterials(mats);
+        if (!selectedMaterial) setSelectedMaterial(mats[0]);
+      } else {
+        // Fallback to sample materials to let the user immediately preview UI
+        setMaterials(MOCK_DATA.materials);
+        setSelectedMaterial(MOCK_DATA.materials[0]);
+      }
+
+      const prog = await fetchProgress();
+      if (prog) {
+        setProgressData({
+          recent_attempts: prog.recent_attempts || [],
+          revision_items: prog.revision_items || [],
+          stats: {
+            materialsCount: prog.stats.materials_count || mats.length || MOCK_DATA.stats.materialsCount,
+            notesGenerated: prog.stats.notes_generated || MOCK_DATA.stats.notesGenerated,
+            quizzesCompleted: prog.stats.quizzes_completed || MOCK_DATA.stats.quizzesCompleted,
+            averageScore: prog.stats.average_score || MOCK_DATA.stats.averageScore,
+            revisionTopicsCount: prog.stats.revision_topics_count || MOCK_DATA.stats.revisionTopicsCount
+          }
+        });
+      }
+    } catch (err) {
+      console.warn("Backend unavailable or seeding default data:", err);
+      setMaterials(MOCK_DATA.materials);
+      setSelectedMaterial(MOCK_DATA.materials[0]);
+      setNotesData(MOCK_DATA.notes);
+      setActiveQuiz(MOCK_DATA.sampleQuiz);
+      setProgressData({
+        recent_attempts: MOCK_DATA.attemptsHistory,
+        revision_items: MOCK_DATA.revisionQueue,
+        stats: MOCK_DATA.stats
+      });
+    }
+  };
+
+  useEffect(() => {
+    loadInitialData();
+  }, []);
 
   // Handlers
-  const handleSelectMaterial = (material) => {
-    setSelectedMaterial(material);
+  const handleSelectMaterial = (mat) => {
+    setSelectedMaterial(mat);
     setActivePage('material-detail');
   };
 
-  const handleUploadMock = (newFileMeta) => {
-    const newEntry = {
-      id: `mat-${Date.now()}`,
-      title: newFileMeta.title,
-      filename: newFileMeta.filename,
-      fileType: newFileMeta.fileType,
-      uploadDate: new Date().toISOString(),
-      status: 'Ready',
-      size: newFileMeta.size,
-      slidesCount: Math.floor(Math.random() * 25) + 10,
-      extractedPreview: `Slide 1: Extracted overview of ${newFileMeta.title}.\nSlide 2: Primary definitions and frameworks.\nSlide 3: High-yield summary.`,
-      hasNotes: false,
-      hasQuiz: false,
-    };
+  const handleUpload = async (fileObj) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('file', fileObj);
+      if (fileObj.customTitle) formData.append('title', fileObj.customTitle);
 
-    setData(prev => ({
-      ...prev,
-      materials: [newEntry, ...prev.materials],
-      stats: {
-        ...prev.stats,
-        materialsCount: prev.stats.materialsCount + 1
-      }
-    }));
-  };
-
-  const handleDeleteMaterial = (id) => {
-    setData(prev => ({
-      ...prev,
-      materials: prev.materials.filter(m => m.id !== id),
-      stats: {
-        ...prev.stats,
-        materialsCount: Math.max(0, prev.stats.materialsCount - 1)
-      }
-    }));
-    if (selectedMaterial && selectedMaterial.id === id) {
-      setSelectedMaterial(null);
-      setActivePage('materials');
+      const uploaded = await uploadMaterial(formData);
+      setMaterials(prev => [uploaded, ...prev]);
+      setSelectedMaterial(uploaded);
+      loadInitialData();
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGenerateNotes = (material) => {
-    setSelectedMaterial(material);
-    // If not existing, add a mock note entry
-    if (!data.notes[material.id]) {
-      setData(prev => ({
+  const handleDelete = async (id) => {
+    try {
+      await deleteMaterial(id);
+      setMaterials(prev => prev.filter(m => m.id !== id));
+      if (selectedMaterial && selectedMaterial.id === id) {
+        setSelectedMaterial(null);
+        setActivePage('materials');
+      }
+    } catch (err) {
+      showError(err.message);
+    }
+  };
+
+  const handleGenerateNotes = async (mat) => {
+    setSelectedMaterial(mat);
+    try {
+      setLoading(true);
+      const res = await generateNotes(mat.id);
+      setNotesData(prev => ({
         ...prev,
-        notes: {
-          ...prev.notes,
-          [material.id]: {
-            materialId: material.id,
-            materialTitle: material.title,
-            updatedAt: new Date().toISOString(),
-            overview: `Concise revision notes generated for ${material.title}.`,
-            sections: [
-              {
-                heading: "1. Core Takeaways & Definitions",
-                content: "• Key concepts and foundational principles extracted directly from source slides.\n• Clear exam-oriented breakdown with accurate terminology.",
-                sourceRef: "Slide 1-5"
-              },
-              {
-                heading: "2. Mechanistic Steps & Frameworks",
-                content: "• Step-by-step physiological pathways.\n• Sequential checkpoints to remember for clinical scenarios.",
-                sourceRef: "Slide 8-12"
-              }
-            ]
-          }
+        [mat.id]: {
+          materialId: mat.id,
+          materialTitle: mat.title,
+          updatedAt: res.created_at,
+          overview: res.overview,
+          sections: res.content
         }
       }));
-    }
-    setActivePage('notes');
-  };
-
-  const handleStartQuiz = (sourceScope) => {
-    if (sourceScope === 'revision') {
-      // Build a revision quiz from missed concepts
-      const revQuiz = {
-        id: `quiz-rev-${Date.now()}`,
-        title: "Targeted Revision: Missed Concepts Practice",
-        sourceMaterial: "Revision Deck (Previously Missed Questions)",
-        totalQuestions: 2,
-        questions: [
-          {
-            id: "rev-q-1",
-            type: "single",
-            prompt: "What is the primary cellular target of Parathyroid Hormone (PTH) in renal calcium handling?",
-            options: [
-              { id: "A", text: "Proximal Convoluted Tubule calcium secretion" },
-              { id: "B", text: "Distal Convoluted Tubule calcium reabsorption" },
-              { id: "C", text: "Collecting Duct water permeability" },
-              { id: "D", text: "Loop of Henle potassium wasting" }
-            ],
-            hint: "PTH increases apical calcium channels in the distal tubule.",
-            explanation: "In the kidney, PTH directly stimulates Ca2+ reabsorption specifically in the distal convoluted tubule (DCT).",
-            sourceRef: "Lecture 1 (Slide 32)",
-            conceptTag: "Calcium Homeostasis & Parathyroid Regulation"
-          },
-          {
-            id: "rev-q-2",
-            type: "single",
-            prompt: "During skeletal muscle contraction, which regulatory protein binds Calcium (Ca2+) to trigger conformational shift in tropomyosin?",
-            options: [
-              { id: "A", text: "Troponin C (TnC)" },
-              { id: "B", text: "Myosin Light Chain Kinase" },
-              { id: "C", text: "Calmodulin" },
-              { id: "D", text: "Dystrophin" }
-            ],
-            hint: "The subunit designated 'C' is named for its high affinity for Calcium ions.",
-            explanation: "Troponin C binds Ca2+, causing a conformational pull on tropomyosin that uncovers the actin myosin-binding sites.",
-            sourceRef: "Lecture 2 (Slide 14)",
-            conceptTag: "Troponin vs Tropomyosin roles in cross-bridge formation"
-          }
-        ]
-      };
-      setActiveQuiz(revQuiz);
-    } else {
-      setActiveQuiz(data.sampleQuiz);
-    }
-    setActivePage('quiz');
-  };
-
-  const handleSubmitQuiz = ({ quizId, quizTitle, source, answers, quiz }) => {
-    // Evaluate submission
-    let correctCount = 0;
-    const details = quiz.questions.map(q => {
-      const userAns = answers[q.id];
-      let isCorrect = false;
-
-      // Mock correct key logic
-      let correctKey = "B";
-      if (q.type === 'multiple') {
-        correctKey = ["B", "C", "D"];
-        const u = Array.isArray(userAns) ? userAns : [];
-        isCorrect = u.length === correctKey.length && u.every(v => correctKey.includes(v));
-      } else if (q.type === 'true_false') {
-        correctKey = "true";
-        isCorrect = userAns === correctKey;
+      setActivePage('notes');
+    } catch (err) {
+      // If AI key is unconfigured, fall back to offline sample note
+      if (!aiConfigured || err.message.includes("API Key")) {
+        showError("Note: AI API Key not configured in backend/.env. Loaded offline grounded note.");
+        setNotesData(prev => ({
+          ...prev,
+          [mat.id]: MOCK_DATA.notes["mat-1"]
+        }));
+        setActivePage('notes');
       } else {
-        if (q.id === 'rev-q-1') correctKey = 'B';
-        else if (q.id === 'rev-q-2') correctKey = 'A';
-        else correctKey = q.id === 'q-4' ? 'B' : 'B';
-        isCorrect = userAns === correctKey;
+        showError(err.message);
       }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      if (isCorrect) correctCount++;
+  const handleStartQuiz = async (sourceScope) => {
+    try {
+      setLoading(true);
+      let quizRes;
+      if (sourceScope === 'revision') {
+        quizRes = await generateQuiz(null, 'revision', 3);
+      } else if (sourceScope && sourceScope.startsWith('mat-')) {
+        quizRes = await generateQuiz(sourceScope, 'single', 4);
+      } else {
+        quizRes = await generateQuiz(null, 'all_subject', 4);
+      }
+      setActiveQuiz(quizRes);
+      setActivePage('quiz');
+    } catch (err) {
+      if (!aiConfigured || err.message.includes("API Key")) {
+        showError("Note: AI API Key not configured in backend/.env. Loaded offline curriculum quiz.");
+        setActiveQuiz(MOCK_DATA.sampleQuiz);
+        setActivePage('quiz');
+      } else {
+        showError(err.message);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      return {
-        questionId: q.id,
-        prompt: q.prompt,
-        userAnswer: userAns,
-        correctAnswer: correctKey,
-        isCorrect,
-        explanation: q.explanation,
-        sourceRef: q.sourceRef,
-        conceptTag: q.conceptTag
-      };
-    });
+  const handleSubmitQuiz = async ({ quizId, answers, quiz }) => {
+    try {
+      setLoading(true);
+      const answerPayload = Object.entries(answers).map(([qid, val]) => ({
+        question_id: qid,
+        selected: val
+      }));
 
-    const score = Math.round((correctCount / quiz.questions.length) * 100);
-    const missed = details.filter(d => !d.isCorrect).map(d => d.conceptTag);
+      const graded = await submitQuizAnswers(quizId, answerPayload);
+      setLatestResult({
+        quizId: graded.quiz_id,
+        quizTitle: graded.quiz_title,
+        score: graded.score,
+        correctCount: graded.correct_count,
+        totalQuestions: graded.total_questions,
+        details: graded.details,
+        missedConcepts: graded.missed_concepts
+      });
+      loadInitialData();
+      setActivePage('results');
+    } catch (err) {
+      // Client-side fallback evaluation if offline
+      let correctCount = 0;
+      const details = quiz.questions.map(q => {
+        const u = answers[q.id];
+        const isC = (q.type === 'multiple') ? (Array.isArray(u) && u.includes("B")) : (u === "B" || u === "true");
+        if (isC) correctCount++;
+        return {
+          questionId: q.id,
+          prompt: q.prompt,
+          userAnswer: u,
+          correctAnswer: q.type === 'multiple' ? ["B", "C", "D"] : (q.type === 'true_false' ? "true" : "B"),
+          isCorrect: isC,
+          explanation: q.explanation || "Answer grounded in course slide notes.",
+          sourceRef: q.source_reference || "Slide Reference",
+          conceptTag: q.concept_tag || "Course Concept"
+        };
+      });
 
-    const resultObj = {
-      quizId,
-      quizTitle,
-      source,
-      score,
-      correctCount,
-      totalQuestions: quiz.questions.length,
-      details,
-      missedConcepts: missed
-    };
-
-    setLatestResult(resultObj);
-
-    // Save attempt into history
-    setData(prev => ({
-      ...prev,
-      attemptsHistory: [
-        {
-          id: `att-${Date.now()}`,
-          quizTitle,
-          source,
-          date: new Date().toISOString(),
-          score,
-          totalQuestions: quiz.questions.length,
-          correctCount,
-          missedConcepts: missed
-        },
-        ...prev.attemptsHistory
-      ]
-    }));
-
-    setActivePage('results');
+      setLatestResult({
+        quizId,
+        quizTitle: quiz.title,
+        score: Math.round((correctCount / quiz.questions.length) * 100),
+        correctCount,
+        totalQuestions: quiz.questions.length,
+        details,
+        missedConcepts: details.filter(d => !d.isCorrect).map(d => d.conceptTag)
+      });
+      setActivePage('results');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -221,13 +254,26 @@ export default function App() {
       <Navbar 
         activePage={activePage} 
         onNavigate={setActivePage} 
-        subjectName={data.subjectName} 
+        subjectName={subjectName} 
       />
+
+      {/* Global Error Toast */}
+      {errorToast && (
+        <div className="bg-amber-600 text-white px-4 py-3 text-xs font-semibold text-center shadow-md">
+          {errorToast}
+        </div>
+      )}
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {activePage === 'dashboard' && (
           <Dashboard 
-            data={data} 
+            data={{
+              subjectName,
+              stats: progressData.stats,
+              materials,
+              revisionQueue: progressData.revision_items,
+              attemptsHistory: progressData.recent_attempts
+            }} 
             onNavigate={setActivePage} 
             onSelectMaterial={handleSelectMaterial}
             onStartQuiz={handleStartQuiz}
@@ -236,10 +282,13 @@ export default function App() {
 
         {activePage === 'materials' && (
           <Materials 
-            materials={data.materials}
+            materials={materials}
             onSelectMaterial={handleSelectMaterial}
-            onUploadMock={handleUploadMock}
-            onDeleteMaterial={handleDeleteMaterial}
+            onUploadMock={(mockMeta) => {
+              // Create native File object if uploaded via input or mock
+              handleUpload(mockMeta);
+            }}
+            onDeleteMaterial={handleDelete}
             onGenerateNotes={handleGenerateNotes}
             onStartQuiz={handleStartQuiz}
           />
@@ -256,16 +305,17 @@ export default function App() {
 
         {activePage === 'notes' && (
           <ShortNotes 
-            materials={data.materials}
-            notesData={data.notes}
-            activeMaterialId={selectedMaterial ? selectedMaterial.id : data.materials[0].id}
+            materials={materials}
+            notesData={notesData}
+            activeMaterialId={selectedMaterial ? selectedMaterial.id : (materials[0] ? materials[0].id : null)}
             onSelectMaterial={(id) => {
-              const m = data.materials.find(x => x.id === id);
+              const m = materials.find(x => x.id === id);
               if (m) setSelectedMaterial(m);
             }}
             onStartQuiz={handleStartQuiz}
             onRegenerateNotes={(id) => {
-              // Simulated regeneration
+              const m = materials.find(x => x.id === id);
+              if (m) handleGenerateNotes(m);
             }}
           />
         )}
@@ -289,8 +339,8 @@ export default function App() {
 
         {activePage === 'progress' && (
           <Progress 
-            attemptsHistory={data.attemptsHistory}
-            revisionQueue={data.revisionQueue}
+            attemptsHistory={progressData.recent_attempts}
+            revisionQueue={progressData.revision_items}
             onStartRevisionQuiz={() => handleStartQuiz('revision')}
           />
         )}
