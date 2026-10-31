@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.db.init_db import init_db
+from app.api import materials
 
 settings = get_settings()
 
@@ -23,6 +24,9 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     init_db()
+
+# Include Routers
+app.include_router(materials.router)
 
 @app.get("/api/health")
 def health_check():
