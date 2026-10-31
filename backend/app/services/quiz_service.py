@@ -13,33 +13,33 @@ RULES:
 2. Support a mix of:
    - "single" (Multiple choice with exactly one correct option: "A", "B", "C", or "D")
    - "multiple" (Multiple-choice where one or more options are correct, e.g. ["A", "C"])
-   - "true_false" (True or False, options: [{"id": "true", "text": "True"}, {"id": "false", "text": "False"}], correct_answers: "true" or "false")
+   - "true_false" (True or False, options: [{{"id": "true", "text": "True"}}, {{"id": "false", "text": "False"}}], correct_answers: "true" or "false")
 3. Include:
    - A hidden "hint" that guides recall without giving away the answer.
    - An "explanation" that clearly justifies the correct answer.
    - "concept_tag": A short 2-4 word concept name for progress tracking.
    - "source_reference": e.g., "Slide 4" or "Page 2" when found in text.
 4. Output MUST be valid JSON adhering to:
-{
+{{
   "title": "Quiz Title",
   "questions": [
-    {
+    {{
       "question_type": "single",
       "prompt": "Question text here?",
       "options": [
-        {"id": "A", "text": "Option A"},
-        {"id": "B", "text": "Option B"},
-        {"id": "C", "text": "Option C"},
-        {"id": "D", "text": "Option D"}
+        {{"id": "A", "text": "Option A"}},
+        {{"id": "B", "text": "Option B"}},
+        {{"id": "C", "text": "Option C"}},
+        {{"id": "D", "text": "Option D"}}
       ],
       "correct_answers": "B",
       "hint": "Recall the builder cell type...",
       "explanation": "Osteoblasts synthesize osteoid...",
       "concept_tag": "Bone Histology",
       "source_reference": "Slide 3"
-    }
+    }}
   ]
-}
+}}
 """
 
 def generate_quiz_for_content(
@@ -68,7 +68,13 @@ Extracted Source Content:
 \"\"\"
 """
 
-    quiz_data = generate_structured_json(user_prompt, system_instruction=system_prompt)
+    try:
+        quiz_data = generate_structured_json(user_prompt, system_instruction=system_prompt)
+    except ValueError as e:
+        if "AI_API_KEY_MISSING" in str(e):
+            from app.services.ai_provider import generate_offline_heuristic_quiz
+            return generate_offline_heuristic_quiz(source_title, text_content, num_questions)
+        raise e
     
     # Validate questions
     questions = quiz_data.get("questions", [])

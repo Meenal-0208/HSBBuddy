@@ -14,16 +14,16 @@ CRITICAL RULES:
 3. If an example or formula is not in the slides, DO NOT make one up.
 4. Always cite specific Slide / Page numbers in sourceRef whenever available.
 5. Return your response as a valid JSON object matching this schema:
-{
+{{
   "overview": "Short 2-3 sentence high-level overview of the topic.",
   "sections": [
-    {
+    {{
       "heading": "Clear section title (e.g. 1. Core Definitions & Histology)",
       "content": "Concise bulleted or structured text using bold key terms.",
       "sourceRef": "Slide 1-4"
-    }
+    }}
   ]
-}
+}}
 """
 
 def generate_notes_for_content(source_title: str, text_content: str) -> Dict[str, Any]:
@@ -46,4 +46,10 @@ Extracted Text Content:
 Please generate the structured study notes in JSON format.
 """
 
-    return generate_structured_json(user_prompt, system_instruction=system_prompt)
+    try:
+        return generate_structured_json(user_prompt, system_instruction=system_prompt)
+    except ValueError as e:
+        if "AI_API_KEY_MISSING" in str(e):
+            from app.services.ai_provider import generate_offline_heuristic_notes
+            return generate_offline_heuristic_notes(source_title, text_content)
+        raise e
