@@ -67,6 +67,28 @@ export default function App() {
         setSelectedMaterial(MOCK_DATA.materials[0]);
       }
 
+      // Load saved notes from SQLite
+      try {
+        const savedNotes = await fetchNotes();
+        if (savedNotes && savedNotes.length > 0) {
+          const notesMap = {};
+          savedNotes.forEach(n => {
+            const key = n.material_id || 'all_subject';
+            const mat = mats.find(m => m.id === n.material_id);
+            notesMap[key] = {
+              materialId: n.material_id,
+              materialTitle: mat ? mat.title : 'All Course Materials',
+              updatedAt: n.created_at,
+              overview: n.overview,
+              sections: n.content
+            };
+          });
+          setNotesData(notesMap);
+        }
+      } catch (e) {
+        console.warn("Could not load notes:", e);
+      }
+
       const prog = await fetchProgress();
       if (prog) {
         setProgressData({
