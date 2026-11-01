@@ -91,12 +91,9 @@ export default function App() {
         console.warn("Could not load notes:", e);
       }
 
-      // Preload quizzes from backend so Quiz view is never empty
+      // Don't auto-force the first quiz so user always gets the interactive topic picker
       try {
-        const existingQuizzes = await fetchQuizzes();
-        if (existingQuizzes && existingQuizzes.length > 0) {
-          setActiveQuiz(existingQuizzes[0]);
-        }
+        await fetchQuizzes();
       } catch (e) {
         console.warn("Could not load quizzes:", e);
       }
@@ -305,7 +302,12 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
       <Navbar 
         activePage={activePage} 
-        onNavigate={setActivePage} 
+        onNavigate={(page) => {
+          if (page === 'quiz') {
+            setActiveQuiz(null); // Show topic chooser modal with all 5 quizzes
+          }
+          setActivePage(page);
+        }} 
         subjectName={subjectName} 
       />
 

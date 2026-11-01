@@ -38,47 +38,42 @@ export default function Quiz({
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
               Interactive Pop-up Quiz
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-3">
-              Select a Topic to Start Quiz
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
+              Select Which PPT Quiz to Take
             </h2>
-            <p className="text-xs text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
-              Analytical and situational case questions testing real system design, error codes, and architectural trade-offs.
+            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
+              5 Dedicated PPT Quizzes • 50 Situational & Case Questions Each (250 Questions Total)
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-2.5 text-left">
-            {materials.map((m) => (
+            {materials.map((m, idx) => (
               <button
                 key={m.id}
                 onClick={() => onSelectMaterial(m.id)}
-                className="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/70 text-left transition group flex items-center justify-between"
+                className="p-3.5 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50/70 text-left transition group flex items-center justify-between"
               >
-                <div>
-                  <div className="text-xs font-bold text-slate-800 group-hover:text-blue-700">
-                    {m.title}
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
+                    {idx + 1}
                   </div>
-                  <div className="text-[11px] text-slate-400 mt-0.5">
-                    {m.slidesCount > 0 ? `${m.slidesCount} slides covered` : 'Lecture deck'}
+                  <div>
+                    <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-700">
+                      {m.title}
+                    </div>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="text-[10px] font-extrabold text-blue-600 bg-blue-100/70 px-2 py-0.5 rounded-full">
+                        50 Questions
+                      </span>
+                      <span className="text-[11px] text-slate-400">
+                        {m.original_filename || m.title}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition" />
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition" />
               </button>
             ))}
-
-            <button
-              onClick={() => onSelectMaterial(null)}
-              className="p-3.5 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/60 text-left transition flex items-center justify-between"
-            >
-              <div>
-                <div className="text-xs font-black text-indigo-900">
-                  🌟 Comprehensive Quiz (All Topics Combined)
-                </div>
-                <div className="text-[11px] text-indigo-600">
-                  Strategic cross-deck questions
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-indigo-500" />
-            </button>
           </div>
 
           <button
@@ -148,26 +143,42 @@ export default function Quiz({
     <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden my-auto">
         
-        {/* Modal Top Header */}
-        <div className="p-5 sm:p-6 bg-slate-900 text-white flex items-center justify-between shrink-0">
-          <div className="min-w-0 pr-4">
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-500/30 text-blue-300 mb-1">
-              <Sparkles className="w-3 h-3" />
-              Pop-up Case Challenge
+        {/* Modal Top Header with Topic Selector */}
+        <div className="p-4 sm:p-5 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-500/30 text-blue-300">
+                <Sparkles className="w-3 h-3" />
+                Case Challenge ({total} Questions)
+              </span>
+              <span className="text-[10px] text-slate-400">
+                Switch Deck:
+              </span>
+              <select
+                value={activeMaterialId || (quiz.materialId || "")}
+                onChange={(e) => onSelectMaterial(e.target.value || null)}
+                className="bg-slate-800 text-blue-300 border border-slate-700 text-xs font-bold rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+              >
+                {materials.map((m) => (
+                  <option key={m.id} value={m.id} className="bg-slate-900 text-white">
+                    {m.title}
+                  </option>
+                ))}
+              </select>
             </div>
-            <h2 className="text-base sm:text-lg font-black truncate text-white">
+            <h2 className="text-sm sm:text-base font-black truncate text-white">
               {quiz.title}
             </h2>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
             {/* Progress indicator */}
-            <div className="hidden sm:block text-right">
+            <div className="text-right">
               <div className="text-xs font-extrabold text-blue-400">
                 Question {currentIndex + 1} of {total}
               </div>
               <div className="text-[10px] text-slate-400">
-                {answeredCount} answered
+                {answeredCount} of {total} answered
               </div>
             </div>
 
