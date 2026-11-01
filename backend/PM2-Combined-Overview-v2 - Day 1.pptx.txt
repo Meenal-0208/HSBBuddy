@@ -1,0 +1,508 @@
+=== SLIDE 1 ===
+PM2-01 & PM2-02  ·  COMBINED OVERVIEW
+How Software Works, Meet the Stack
+A fast, high-level tour for Product Managers — everything in one hour
+Dr. Anand Fadte
+
+=== SLIDE 2 ===
+AGENDA
+What We Cover Today
+1
+How software actually works — three layers, one diagram
+2
+Web fundamentals: HTTP, DNS, encryption, ports
+3
+Cookies, sessions, CDNs & caching
+4
+Front-end vs. back-end — who owns what
+5
+The front-end tech stack in blocks
+6
+Styling, rendering, responsive design & build tools
+7
+The back-end tech stack in blocks
+8
+Architecture patterns: monolith, microservices, containers
+APIs & real-time: REST, GraphQL, WebSockets
+Mobile: native, cross-platform & PWAs
+Mobile under the hood: lifecycle, push, offline, performance
+Databases: SQL vs. NoSQL, scaling & the cloud
+DevOps: CI/CD, Git, monitoring, security
+Stack choice as a business decision
+Key takeaways & essential glossary
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 3 ===
+THE BIG PICTURE
+How Software Actually Works
+THE THREE LAYERS — EVERY APP HAS THESE
+Client (Front-End)
+What the user sees & taps
+Browser or mobile app
+Server (Back-End)
+Business logic, rules,
+authorization checks
+Database (Data Layer)
+Stores everything
+permanently
+WHAT HAPPENS WHEN A USER TAPS A BUTTON
+1. DNS Lookup
+Find the server's address
+2. Secure Connect
+HTTPS handshake (TLS)
+3. Request Sent
+GET or POST with data
+4. Server Processes
+Logic + DB query
+5. Response Back
+JSON / HTML returned
+6. UI Updates
+Screen reflects the result
+WHY THIS MATTERS FOR PMs
+Shared Language
+Talk to engineers fluently
+Better Specs
+Right vocab = accurate estimates
+Debug Faster
+Know where a problem lives
+Opening Instagram: your phone (client) sends a request to Instagram's servers, which query the database and return your feed.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 4 ===
+WEB FUNDAMENTALS
+The Plumbing Under Every Web App
+THE PROTOCOLS THAT MAKE THE WEB WORK
+HTTP
+The language browsers & servers use
+GET, POST, PUT, DELETE
+HTTPS / TLS
+HTTP + encryption
+The lock icon in your browser
+TCP/IP
+How data travels: split into
+packets, reassembled in order
+DNS
+Translates domain names
+to server IP addresses
+STATUS CODES — THE SERVER'S SHORTHAND REPLY
+Code | Meaning | When You See It
+200 OK | Success | Everything worked
+301 Redirect | Moved permanently | Old URL forwarded to new one
+400 Bad Request | Client error | Missing or invalid data in the request
+404 Not Found | Page missing | Wrong URL or deleted resource
+500 Server Error | Server crashed | Bug in the back-end code
+PORTS — THE DOORS DATA WALKS THROUGH
+Port 80
+HTTP (unencrypted)
+Port 443
+HTTPS (encrypted)
+Port 3000
+Dev servers (React, etc.)
+Port 5432
+PostgreSQL database
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 5 ===
+STATE & SPEED
+Cookies, Sessions, CDNs & Caching
+HOW SITES REMEMBER YOU
+COOKIES & SESSIONS
+Cookies  —  small data stored in the browser by the site
+Sessions  —  server-side record that keeps you logged in
+Tokens (JWT)  —  signed credentials the client sends each request
+Privacy concern  —  third-party cookies track you across sites
+CDNs & CACHING
+CDN  —  copies content to servers near the user worldwide
+Browser cache  —  stores files locally so repeat visits load instantly
+Server cache  —  keeps hot data in memory (Redis, Memcached)
+Cache invalidation  —  "hardest problem in CS" — stale data vs. speed
+E
+EXAMPLE
+Amazon cart survives a closed browser (cookie). Netflix streams from a nearby CDN server, not from one data center on another continent — that's the speed payoff.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 6 ===
+THE DIVISION OF LABOUR
+Front-End vs. Back-End & API Contracts
+WHO OWNS WHAT
+FRONT-END
+What users see  —  buttons, screens, animations
+Runs in the browser  —  or as a native app
+Basic validation  —  e.g. 'email looks right'
+BACK-END
+Data, logic, security  —  pricing, permissions, fraud checks
+Runs on the server  —  users never see the code
+Never trust the client  —  re-validates everything
+THE API CONTRACT — THE HANDSHAKE BETWEEN THEM
+What Is It?
+Agreed rules for how FE
+and BE exchange data
+Why It Matters
+Teams build in parallel
+once the contract is set
+Versioning
+Backend can improve
+without breaking the app
+Documentation
+Swagger / OpenAPI so
+everyone speaks the same
+E
+EXAMPLE
+A food app: front-end shows the order instantly; back-end verifies payment, checks for fraud, and confirms. The API contract is what keeps them in sync.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 7 ===
+THE FRONT-END STACK
+Building Blocks, the DOM & Major Frameworks
+THE THREE BUILDING BLOCKS — EVERY WEB PAGE USES THESE
+HTML
+Structure — the skeleton
+of every page
+CSS
+Appearance — colours,
+spacing, fonts, layout
+JavaScript
+Behaviour — what makes
+the page interactive
+THE DOM & RENDERING
+DOM
+Browser's live model of the page — code reads & changes it
+Rendering
+Turns HTML + CSS + JS into pixels — slow = 'janky' UI
+Virtual DOM
+React's trick: batch changes in memory, then update once
+MAJOR FRAMEWORKS BUILT ON TOP
+Framework | Released | Key Trait | Used By
+React | 2013 (Meta) | Virtual DOM, component-based, largest talent pool | Meta, Netflix, Airbnb
+Angular | 2016 (Google) | Full framework, strict structure, enterprise-grade | Google, Microsoft, Deutsche Bank
+Vue.js | 2014 | Gentle learning curve, flexible, popular in Asia | Alibaba, Xiaomi, GitLab
+Svelte | 2019 | Compiles away the framework — smallest, fastest bundles | Apple (docs), NY Times
+TypeScript (JS + static types) is now the default for large codebases — all four frameworks support it.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 8 ===
+FRONT-END (CONTINUED)
+Styling, Rendering, Build Tools & Accessibility
+CSS FRAMEWORKS — PRE-BUILT STYLING KITS
+Tailwind CSS
+Utility-first, modern default
+Bootstrap
+Classic, fast prototyping
+Material UI
+Google's design system
+Shadcn/UI
+Copy-paste components
+RENDERING STRATEGY — WHERE DOES THE HTML GET BUILT?
+Approach | How It Works | Best For
+CSR (Client-Side) | Browser downloads blank page + JS builds the UI | Dashboards, internal tools
+SSR (Server-Side) | Server sends pre-rendered HTML per request | SEO-critical, marketing sites
+SSG (Static) | Pages pre-built at deploy time | Blogs, docs, landing pages
+Hybrid (Next.js) | Mixes SSR & CSR per route | Most modern SaaS products
+THE BUILD PIPELINE + ACCESSIBILITY
+Bundlers
+Vite / Webpack — combine
+files into one package
+Package Managers
+npm / pnpm — install &
+manage JS dependencies
+Responsive Design
+Layouts that adapt to
+any screen size
+Accessibility (a11y)
+Alt text, keyboard nav,
+screen-reader support
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 9 ===
+THE BACK-END STACK
+Server Languages, Web Servers & ORMs
+POPULAR BACK-END LANGUAGES & RUNTIMES
+Language / Runtime | Strengths | Common Frameworks | Used By
+Node.js (JavaScript) | Same language as front-end, fast I/O | Express, Fastify, NestJS | Netflix, PayPal, LinkedIn
+Python | Readable, dominant in AI/ML | Django, Flask, FastAPI | Instagram, Spotify, Stripe
+Java / Kotlin | Enterprise-grade, JVM performance | Spring Boot | Amazon, Goldman Sachs
+Go | Fast, compiled, great for microservices | Gin, Echo | Google, Uber, Twitch
+Ruby | Developer-friendly, rapid prototyping | Rails | GitHub, Shopify, Basecamp
+WEB SERVERS & ORMs
+WEB SERVERS — THE FRONT DOOR
+Nginx  —  most popular, reverse proxy, serves static files
+Apache  —  veteran, widely supported, .htaccess config
+Caddy  —  auto-HTTPS, modern alternative
+ORMs — CODE TALKING TO DATABASES
+What it does  —  lets engineers use code instead of raw SQL
+Examples  —  SQLAlchemy (Python), Prisma (JS), Hibernate (Java)
+Trade-off  —  convenient but can be less efficient at scale
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 10 ===
+ARCHITECTURE PATTERNS
+Monolith vs. Microservices, Containers & Serverless
+HOW APPS ARE STRUCTURED
+Monolith
+One large codebase does everything.
+All features deploy together.
++ Simple to start
++ Easy debugging
+– Hard to scale individual parts
+– One bug can bring down everything
+Microservices
+App split into many small services.
+Each deploys & scales independently.
++ Independent scaling & deployment
++ Teams own their service
+– Network complexity
+– Harder to debug across services
+THE INFRASTRUCTURE THAT MAKES IT WORK
+Containers (Docker)
+Packages an app with everything
+it needs — runs anywhere
+Kubernetes (K8s)
+Orchestrates containers at scale
+— auto-scaling, self-healing
+Serverless
+Code runs on demand, pay per
+use, no server to manage
+E
+EXAMPLE
+Amazon broke its monolith into microservices so hundreds of teams could ship independently. Each runs in Docker containers orchestrated by Kubernetes.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 11 ===
+APIs & REAL-TIME
+REST, GraphQL, WebSockets & Message Queues
+HOW SYSTEMS TALK TO EACH OTHER
+Pattern | How It Works | Best For | Example
+REST API | Fixed endpoints, GET/POST/PUT/DELETE + JSON | Most web & mobile apps | Twitter, Stripe, GitHub
+GraphQL | Client asks for exactly the data it needs | Complex UIs, multiple data sources | Facebook, Shopify, GitHub
+WebSockets | Persistent two-way connection, real-time | Live chat, dashboards, trading | Slack, Binance, Figma
+gRPC | Binary protocol, strongly typed, very fast | Microservice-to-microservice | Google, Netflix internal
+MESSAGE QUEUES & EVENT-DRIVEN SYSTEMS
+Message Queue
+Holds tasks so systems process
+them without being blocked
+Event-Driven
+Systems react to events instead
+of constantly polling
+Common Tools
+RabbitMQ, Apache Kafka,
+AWS SQS
+E
+EXAMPLE
+When you place an order, it drops into a queue: payment, inventory, and notifications each process it in parallel — no one waits for the others.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 12 ===
+MOBILE PLATFORMS
+Native, Cross-Platform & PWAs — Choosing the Right Path
+THREE APPROACHES TO BUILDING MOBILE APPS
+Approach | How It Works | Pros | Cons
+Native | Built for one OS (Swift/iOS, Kotlin/Android) | Best performance, full hardware access | Two codebases, double the cost
+Cross-Platform | One codebase, both platforms (React Native, Flutter) | Faster dev, shared code | Slight perf gap, less native feel
+PWA | A website that installs like an app | No app store, instant updates, lightweight | Limited hardware access, no store presence
+iOS vs. ANDROID — THE PLATFORM SPLIT
+iOS (APPLE)
+Swift / Obj-C  —  languages
+Strict App Store review  —  1-3 day approval
+Higher spend users  —  premium market
+ANDROID (GOOGLE)
+Kotlin / Java  —  languages
+Faster Play Store review  —  hours to 1 day
+80%+ global share  —  especially in Asia, Africa
+E
+EXAMPLE
+Grab uses cross-platform for most screens but native code for maps & payments. Pinterest's PWA loads fast on budget phones with weak networks, boosting engagement.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 13 ===
+MOBILE UNDER THE HOOD
+Lifecycle, Push Notifications, Offline, Performance & Security
+THE APP LIFECYCLE & PUSH NOTIFICATIONS
+Install & Onboard
+Download, open,
+first-run setup
+Foreground / BG
+Limited tasks run
+in background
+Updates
+Roll out gradually,
+stay compatible
+Push Notifications
+Via Apple/Google
+servers, opt-in
+OFFLINE MODE & PERFORMANCE
+Local Storage
+Data saved on device
+Offline Mode
+Keep working, sync later
+Battery
+GPS & BG drain it fast
+Memory
+Heavy apps get killed by OS
+Network
+Handle WiFi ↔ 4G ↔ none
+MOBILE SECURITY
+Permissions
+Users approve camera, location, contacts
+Sandboxing
+Each app isolated — can't touch others' data
+Biometrics
+Face ID / fingerprint for sensitive actions
+E
+EXAMPLE
+Google Maps: download a city's map, navigate offline. Swiggy: push notification timed to 'order out for delivery,' not just blasted.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 14 ===
+DATA & INFRASTRUCTURE
+Databases, Scaling & the Cloud
+SQL vs. NoSQL — TWO WAYS TO STORE DATA
+SQL (Relational)
+Structured tables  —  rows & columns with strict schemas
+ACID guarantees  —  consistency first (banks, transactions)
+Examples  —  PostgreSQL, MySQL, SQL Server
+NoSQL (Flexible)
+Flexible structure  —  documents, key-value, graph
+Speed & scale first  —  eventual consistency OK
+Examples  —  MongoDB, DynamoDB, Redis, Cassandra
+SCALING & THE CLOUD
+Vertical Scaling
+Make one server
+bigger & faster
+Horizontal Scaling
+Add more servers
+to share the load
+Load Balancer
+Distributes traffic
+across servers
+Cloud (AWS/GCP/Azure)
+Rent compute on
+demand — auto-scale
+E
+EXAMPLE
+Bank ledger = SQL (strict accuracy). Social feed = NoSQL (speed at scale). During IPL, JioHotstar's cloud auto-adds servers for the traffic spike.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 15 ===
+DEVOPS & RELIABILITY
+CI/CD, Version Control, Monitoring & Security
+VERSION CONTROL & CI/CD — HOW CODE SHIPS SAFELY
+Git
+Tracks every code change;
+nothing is ever lost
+Pull Request
+A second engineer reviews
+before it ships
+CI (Continuous Integration)
+Automated tests run on
+every code push
+CD (Continuous Delivery)
+Tested code deploys to
+production automatically
+MONITORING & LOGGING — KNOWING WHEN SOMETHING BREAKS
+Logging
+Record what happened,
+step by step
+Monitoring Dashboards
+Real-time health:
+latency, errors, uptime
+Alerting
+Fires before users
+complain
+Common Tools
+Datadog, Grafana,
+PagerDuty, Sentry
+SECURITY BASICS
+Authentication
+Who you are
+(login, 2FA, SSO)
+Authorization
+What you're allowed
+to do (roles, ACL)
+Encryption
+In transit (HTTPS)
+& at rest (AES)
+OWASP Top 10
+The standard checklist
+for web vulnerabilities
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 16 ===
+THE PM's PERSPECTIVE
+Stack Choice Is a Business Decision
+WHY STACK CHOICE MATTERS BEYOND TECHNOLOGY
+Hiring Pool
+Popular stacks = easier,
+cheaper to staff
+Switching Cost
+Changing stacks later =
+rebuilding & retesting
+Community & Support
+Large ecosystems mean
+faster problem-solving
+The PM's Role
+Name the constraints;
+let engineering pick the how
+WHEN TECH BETS BACKFIRE — REAL-WORLD LESSONS
+Company | What Happened | The Lesson
+Facebook (2012) | Bet on hybrid web for mobile app speed; felt sluggish. Rebuilt natively. | Premature optimisation for dev speed can cost UX
+Airbnb (2016-18) | Adopted React Native for code sharing; left over hiring & maintenance. | Cross-platform savings can turn into hidden costs
+Twitter (2023) | Rapid migration from microservices back to monolith under new ownership. | Architecture reversals take months and carry risk
+ENGINEERING TERMS YOU'LL HEAR
+Middleware
+Code that checks/logs
+each request on the way
+State Management
+How an app remembers
+what you were doing
+Technical Debt
+Shortcuts now that
+cost more to fix later
+Feature Flags
+Toggle features on/off
+without deploying code
+Build vs. Buy
+Make it yourself or
+pay for a solution?
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 17 ===
+WRAP-UP
+Key Takeaways & Essential Glossary
+THREE THINGS TO REMEMBER
+Think in Layers
+Client, server, data —
+know who owns what
+Ask About Trade-offs
+Every tech choice trades
+speed, cost & flexibility
+You Don't Need to Code
+You need enough vocab
+to ask great questions
+ESSENTIAL GLOSSARY — THE 20 TERMS EVERY PM SHOULD KNOW
+Client  App or browser the user sees
+Server  Remote computer running logic & storing data
+API  Rules for how two systems exchange data
+HTTP / HTTPS  Web protocol; S = encrypted
+DNS  Translates domain names to IP addresses
+TCP/IP  How data packets travel reliably
+REST  Most common API style: endpoints + JSON
+GraphQL  Client asks for exactly the data it needs
+WebSocket  Real-time, two-way connection
+Cookie / Session  How sites remember you
+CDN  Serves content from nearby servers
+SQL / NoSQL  Structured vs. flexible databases
+ORM  Code-level interface to a database
+CI/CD  Automated test & release pipeline
+Git  Tracks every code change
+Docker / Container  Packages app to run anywhere
+Microservices  App split into independent services
+Serverless  Code on demand, no server to manage
+PWA  Website that installs like an app
+Middleware  Code that intercepts each request
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 18 ===
+Thank You
+Questions? Discussions? Let's talk.
+Dr. Anand Fadte
+

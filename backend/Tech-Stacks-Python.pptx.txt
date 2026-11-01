@@ -1,0 +1,212 @@
+=== SLIDE 1 ===
+TECH STACKS DEEP DIVE
+The Python Ecosystem
+A visual field guide for Product Managers  ·  Part 1 of the Tech Stacks series
+Dr. Anand Fadte
+
+=== SLIDE 2 ===
+AGENDA
+What We'll Cover
+1
+Where Python fits in the stack
+2
+Strengths & weaknesses
+3
+Python for desktop apps
+4
+Python for web apps — the big three
+5
+Real example: a FinTech app, start to finish
+6
+Python for data science & AI
+7
+Packaging & deployment options
+8
+Key takeaways & what's next
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 3 ===
+THE LANGUAGE
+Where Python Fits in the Stack
+Presentation Tier
+Frontend / Client
+React, Angular, iOS/Android app
+Logic Tier — Python lives here
+Backend / Server
+Python/Django, Java/Spring, Node.js
+Data Tier
+Database / Storage
+PostgreSQL, MongoDB, Redis
+E
+EXAMPLE
+In a simple web app: the browser is the frontend, a Python server is the backend, and a PostgreSQL database stores the data. Created by Guido van Rossum in 1991, Python is valued for syntax close to plain English — which is why it's often the fastest language for a small team to ship in.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 4 ===
+TRADE-OFFS
+Python's Strengths & Weaknesses
+STRENGTHS
+WEAKNESSES
+Readable syntax — fastest to write, easiest to maintain
+Massive ecosystem — PyPI has 500,000+ packages
+Dominant in AI/ML, data science, and scripting
+Large, active community — easy to hire for
+Slower than Java, Go, or C++ for CPU-intensive tasks
+Not ideal for native mobile app development
+The Global Interpreter Lock (GIL) limits true multi-threading
+Type errors are caught only at runtime, without type hints
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 5 ===
+DESKTOP
+Python for Desktop Apps
+1
+Tkinter
+Built into Python, zero setup. Best for internal tools and quick prototypes — not customer-facing polish.
+2
+PyQt / PySide
+Professional, native-looking UIs for engineering, finance, healthcare tools. PyQt needs a paid license for closed-source apps.
+3
+Kivy
+Touch-first, can even deploy to mobile. Rarely the first choice — consider it only for touch-screen kiosks.
+E
+EXAMPLE
+A manufacturing company needed a warehouse tool fast. An engineer built it in Tkinter in two days — a search box, a results table, a quantity-update button. No internet connection required, and it still runs on the company's aging Windows 7 PCs.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 6 ===
+WEB BACKEND
+Python for Web Apps — The Big Three
+1
+Django (2005)
+"Batteries included": ORM, admin panel, auth, and routing all built in. Powers Instagram and Pinterest. Best for content-heavy, full-stack apps.
+2
+Flask (2010)
+A microframework — just routing and requests; you choose everything else. Best for simple APIs, microservices, and prototypes.
+3
+FastAPI (2018)
+Modern and async-first, with automatic docs and built-in validation. The default choice for new Python APIs today.
+E
+EXAMPLE
+Our own Zenith '26 class project is a live example: FastAPI serves both the HTML frontend and the REST API from one app — exactly the modern, async-first pattern this chapter recommends for new projects.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 7 ===
+COMPARISON
+Django vs. Flask vs. FastAPI
+Framework | Philosophy | Best For | Learning Curve
+Django | "Batteries included" — ORM, auth, admin, routing all built in | Content-heavy sites, e-commerce, SaaS CRUD apps | Medium
+Flask | Microframework — minimal core, you choose the rest | Simple APIs, microservices, prototypes | Low
+FastAPI | Async-first, auto-generated docs, built-in validation | High-concurrency APIs, ML model serving, new projects | Low–Medium
+E
+EXAMPLE
+If your backend team is choosing between Flask and FastAPI today, the guide's own advice is: recommend FastAPI unless they have a specific reason to use Flask.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 8 ===
+REAL EXAMPLE
+A FinTech App, Start to Finish
+User's Phone
+AWS API Gateway
+FastAPI Server (AWS Lambda / EC2)
+Plaid API
+Bank data
+PostgreSQL DB
+Transaction history
+E
+EXAMPLE
+Why this stack: FastAPI's async support means the server isn't stuck waiting on one slow bank-API call before it can handle the next request. PostgreSQL's ACID guarantees mean no transaction record is ever lost — non-negotiable for financial data. All-in cost for a startup at this stage: under $500/month on AWS.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 9 ===
+DATA & AI
+Python for Data Science & AI
+Data Handling
+NumPy · Pandas
+Matplotlib / Seaborn
+Classic ML
+Scikit-learn
+Deep Learning
+TensorFlow/Keras (Google)
+PyTorch (Meta)
+LLM Apps
+Hugging Face Transformers
+LangChain / LlamaIndex
+Exploration
+Jupyter Notebooks
+E
+EXAMPLE
+Python is the undisputed king of data science — it's the language most data scientists and ML engineers already know, which makes it the lingua franca of AI-powered products.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 10 ===
+OPERATIONS
+Packaging & Dependency Management
+pip
+Built-in installer
+"pip install django"
+venv / conda
+Isolates project environments so packages don't conflict
+Poetry / uv
+Modern tools for reproducible builds
+Docker
+Containerizes the app — consistent everywhere it runs
+E
+EXAMPLE
+This is the pipeline PMs should expect to hear about during setup estimation: install → isolate → lock reproducible versions → containerize. Skipping straight to Docker without the earlier steps is a common source of "works on my machine" bugs.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 11 ===
+DEPLOYMENT
+Python Deployment Options
+1
+Traditional Server
+Python + Gunicorn/Uvicorn + Nginx. Best for standard web applications.
+2
+Serverless
+AWS Lambda + Python. Best for APIs with variable traffic and ML inference.
+3
+Container
+Docker + Kubernetes. Best for microservices and scalable APIs.
+4
+PaaS
+Heroku, Render, Railway. Best for small teams and rapid deployment.
+E
+EXAMPLE
+Our Zenith '26 workshop app runs the simplest option of all — a single FastAPI process on a student's own laptop — because a classroom project doesn't need the traffic-handling that serverless or containers solve for.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 12 ===
+REFERENCE
+Summary: When to Use What
+Use Case | Framework / Tool | Maturity | Learning Curve
+Simple desktop app | Tkinter | Very mature | Low
+Professional desktop app | PyQt / PySide | Very mature | Medium
+Full-featured web app | Django | Very mature | Medium
+Lightweight API / microservice | Flask | Very mature | Low
+Modern async API | FastAPI | Mature, growing fast | Low–Medium
+ML model training | PyTorch / TensorFlow | Mature | High
+Data analysis | Pandas + Jupyter | Very mature | Low–Medium
+LLM app | LangChain / LlamaIndex | New, evolving fast | Medium
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 13 ===
+TAKEAWAYS
+Key Takeaways
+1
+Speed over raw performance
+Python's edge is how fast a team can build and iterate — not raw execution speed. That job belongs to Java, Go, or Rust.
+2
+Three frameworks, three jobs
+Django for full-stack content sites, Flask for lightweight services, FastAPI as the modern default for new APIs.
+3
+The AI/ML default
+If a product feature touches machine learning, Python is almost certainly part of the stack — it's the language most data scientists already know.
+E
+EXAMPLE
+Across every use case in this chapter — a warehouse tool, a marketplace, a FinTech app, a chatbot backend — the pattern repeats: Python wins when speed of development matters more than raw throughput.
+Tech Stacks Deep Dive: Python  |  Companion to PM2-01 & PM2-02  |  HSB — Product Management II
+
+=== SLIDE 14 ===
+Dr. Anand Fadte
+

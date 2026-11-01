@@ -1,0 +1,359 @@
+=== SLIDE 1 ===
+PM2-03 & PM2-04  ·  SIMPLIFIED OVERVIEW
+APIs & Integrations
+How apps talk to each other — and why PMs need to understand it
+Dr. Anand Fadte
+
+=== SLIDE 2 ===
+SESSION ROADMAP
+What We Will Cover Today
+01
+What Is an API?
+The restaurant analogy
+02
+How an API Call Works
+5 simple parts
+03
+Error Codes Cheat Sheet
+What went wrong?
+04
+Notifications vs Checking
+Push vs pull
+05
+Working with Partners
+The 5-question checklist
+06
+Build It or Buy It?
+When to use a vendor
+07
+Real Stories & India Examples
+Lessons from real companies
+08
+Mistakes, Takeaways & Glossary
+What to remember
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 3 ===
+THE BIG IDEA
+What Is an API?
+THE RESTAURANT ANALOGY
+Think of an API like a waiter in a restaurant. You (the app) don't go into the kitchen (the server) yourself. You tell the waiter what you want, and the waiter brings it back.
+Your App
+"I need the customer's
+order history"
+The API
+The waiter — takes your
+request to the kitchen
+The Server
+The kitchen — where
+the data actually lives
+FOUR WAYS APIs SHOW UP IN YOUR PRODUCT
+Outside Service
+You use someone else's
+API (e.g. Google Maps)
+Inside Your Company
+Your own apps
+talking to each other
+API as the Product
+The API itself is what
+you sell (e.g. Stripe)
+API as a Shortcut
+Use a ready-made service
+instead of building it
+E
+EXAMPLE
+When you book an Ola ride, the app calls Google Maps API for the route, a payment API for the fare, and an SMS API for the OTP — three different "waiters" serving one experience.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 4 ===
+APIs & REAL-TIME
+REST, GraphQL, WebSockets & Message Queues
+HOW SYSTEMS TALK TO EACH OTHER
+Pattern | How It Works | Best For | Example
+REST API | Fixed endpoints, GET/POST/PUT/DELETE + JSON | Most web & mobile apps | Twitter, Stripe, GitHub
+GraphQL | Client asks for exactly the data it needs | Complex UIs, multiple data sources | Facebook, Shopify, GitHub
+WebSockets | Persistent two-way connection, real-time | Live chat, dashboards, trading | Slack, Binance, Figma
+gRPC | Binary protocol, strongly typed, very fast | Microservice-to-microservice | Google, Netflix internal
+MESSAGE QUEUES & EVENT-DRIVEN SYSTEMS
+Message Queue
+Holds tasks so systems process
+them without being blocked
+Event-Driven
+Systems react to events instead
+of constantly polling
+Common Tools
+RabbitMQ, Apache Kafka,
+AWS SQS
+E
+EXAMPLE
+When you place an order, it drops into a queue: payment, inventory, and notifications each process it in parallel — no one waits for the others.
+PM2-01 & PM2-02  |  Combined Overview  |  HSB — Product Management II
+
+=== SLIDE 5 ===
+HOW IT WORKS
+The 5 Parts of Every API Call
+1. The Address
+Where to send the request
+e.g. /users/482
+2. The Action
+What to do:
+Get, Send, Update, Delete
+3. Your ID Badge
+Proves you're allowed
+to make this call
+4. The Data
+The information you're
+sending (if any)
+5. The Reply
+What comes back —
+data or an error code
+TECHNICAL NAMES (FOR WHEN YOU SEE THEM IN DOCS)
+Simple Name | Technical Name | What It Means
+The Address | Endpoint / URL | The specific location you're calling — like a web address
+The Action | HTTP Method | GET = read, POST = create, PUT = update, DELETE = remove
+Your ID Badge | Auth Header / API Key | A password or token that proves who you are
+The Data | Request Body (JSON) | The actual content you're sending, in a standard format
+The Reply | Response + Status Code | The server's answer — success (200) or an error (400, 500)
+E
+EXAMPLE
+When Swiggy shows you nearby restaurants: Address = /restaurants/nearby, Action = GET, ID Badge = your login token, Data = your location, Reply = list of restaurants with ratings and delivery time.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 6 ===
+WHEN THINGS GO WRONG
+API Error Codes — A Simple Cheat Sheet
+THE THREE CATEGORIES
+2xx = Success
+Everything worked!
+You got what you asked for.
+4xx = Your Mistake
+You sent something wrong.
+Fix it on your side.
+5xx = Their Problem
+The server broke.
+Not your fault — wait & retry.
+CODES YOU'LL SEE MOST OFTEN
+Code | What It Means | What to Do (in Plain English)
+200 | OK — it worked | Nothing to do, the feature is working fine
+400 | Bad request — you sent wrong data | Check what data your app is sending
+401 | Not logged in — missing or wrong password/key | Check if the API key is correct and not expired
+403 | Not allowed — you don't have permission | You need different access rights
+404 | Not found — wrong address | The URL or ID is wrong — double-check it
+429 | Too many requests — slow down! | Your app is calling too fast — add a delay
+500 | Server crashed — their problem | Wait and try again, or contact the partner
+E
+EXAMPLE
+Support says: "Payments are failing with 401 errors." You instantly know: that's an identity problem — probably an expired API key. No need to wait for engineering to investigate.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 7 ===
+STAYING UPDATED
+Two Ways to Get Updates from a Partner
+Checking (Polling)
+You keep asking  —  "Any update?" every few seconds or minutes
+Simple to set up  —  your app just makes repeated calls
+Wasteful  —  most of the time the answer is "no, nothing new"
+Not instant  —  you only find out on the next check
+Good for  —  things that change slowly (nightly reports, weekly syncs)
+Instant Notification (Webhook)
+The partner calls you  —  "Hey, something just happened!" — instantly
+More setup needed  —  you need a receiving address for the partner to call
+Efficient  —  only fires when something actually happens
+Almost real-time  —  you know within seconds
+Good for  —  payments, delivery updates, chat messages
+SIMPLE RULE: TIME-SENSITIVE = NOTIFICATION.  NOT URGENT = CHECKING.
+THREE SAFETY RULES WHEN RECEIVING NOTIFICATIONS
+Handle Repeats
+Same notification twice
+should not charge twice
+("safe to repeat")
+Handle Failures
+If your system is down,
+the partner should retry
+automatically
+Verify It's Real
+Check the signature to
+make sure it's not a
+fake notification
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 8 ===
+PARTNER INTEGRATIONS
+5 Questions Before Saying Yes to a Partner API
+When a partner says "it's easy, we have an API" — ask these 5 questions before putting it on the roadmap.
+1
+Does it actually do
+what we need?
+Don't assume — check the docs.
+The partner may not expose the
+exact feature you're imagining.
+2
+What's the
+speed limit?
+Every API has a cap on how
+many calls you can make.
+Will it handle your traffic?
+3
+What happens
+when they go down?
+Their outage = your outage
+in the user's eyes.
+What's your backup plan?
+4
+How much
+will it cost?
+Free today doesn't mean
+free tomorrow.
+Model the cost at your scale.
+5
+How hard is it
+to switch later?
+If you need to leave this
+partner, how many months
+of work is that?
+E
+EXAMPLE
+A food delivery app during Diwali pushes SMS confirmations past the API's speed limit. Messages silently stop sending. Users think their orders didn't go through. The partner's API is fine — your traffic exceeded the cap.
+Remember: A partner outage = your product's outage in the user's eyes.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 9 ===
+THE BIG DECISION
+Build It Yourself or Use a Vendor?
+Build It Yourself
+Full control  —  you decide everything — features, speed, data format
+Slower to start  —  your team builds from scratch — takes weeks or months
+You maintain it  —  bugs, updates, scaling — all on your team
+No dependency  —  no partner can change pricing or shut down on you
+Use a Vendor (Buy)
+Ship fast  —  plug in and launch in days, not months
+They maintain it  —  security, updates, scaling — vendor handles it
+Risk of dependency  —  they can change prices, terms, or shut down
+Limited customization  —  you get what they offer — can't change everything
+THE SIMPLE SORTING QUESTION
+Is it your secret sauce? BUILD IT.
+Your recommendation engine, risk model,
+or unique algorithm — this is what makes
+you different from competitors.
+Is it plumbing everyone needs? BUY IT.
+SMS sending, maps, payment processing —
+every competitor uses the same vendors.
+Don't waste time rebuilding it.
+E
+EXAMPLE
+A fintech's fraud detection model = build it (that's your edge). Sending OTP via SMS = buy it (use Twilio or MSG91). Building your own SMS system from scratch is like a restaurant growing its own wheat.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 10 ===
+REAL STORIES
+API Decisions That Shaped Famous Products
+Company | What Happened | Lesson for PMs
+Stripe | Built the entire company around a clean, easy-to-use payment API | A great API experience IS the product — developers choose Stripe for its docs
+Google Maps | Changed pricing in 2018 — costs jumped 14x for some apps overnight | Free today doesn't mean free tomorrow — always plan for price changes
+Twitter/X | Changed API access rules in 2023 — thousands of apps broke overnight | When you deeply rely on a partner, their decisions become your problem
+Razorpay | Instant payment notifications let apps confirm UPI payments in seconds | Notifications (webhooks) are better than checking (polling) for payments
+ONDC (India) | Open API standard that lets any buyer app connect to any seller app | A shared API standard can reshape an entire industry
+Aadhaar eKYC
+Supreme Court ruling in
+2018 cut private access.
+Regulation risk is real.
+IRCTC Tatkal
+Heavy speed limits + bot
+blocking during peak
+booking windows.
+WhatsApp Business
+Your message quality score
+affects how many messages
+you're allowed to send.
+PhonePe / UPI
+UPI's open API standard
+let 300+ payment apps
+interoperate across India.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 11 ===
+TIME & EFFORT
+"It's Just an API Call" — How Long It Really Takes
+THE HIDDEN WORK BEHIND EVERY INTEGRATION
+When someone says "it's just an API call," here's what they're not counting:
+Read the Docs
+Understand what the
+API can actually do
+(1-3 days)
+Set Up Login
+Get API keys, set
+up authentication
+(1-2 days)
+Map the Data
+Connect their data
+format to yours
+(2-5 days)
+Handle Errors
+What happens when
+things go wrong?
+(2-3 days)
+Test Everything
+Edge cases, failures,
+scale testing
+Keep Watching
+Monitor for changes,
+outages, problems
+(Ongoing)
+MYTH vs REALITY
+What People Say | What's Actually True
+"We'll just use their API — should be quick" | Authentication + data mapping + error handling + testing = 2-4 weeks minimum
+"APIs are a tech-only thing, PMs don't need to worry" | API choices directly affect features, launch speed, and even business model
+"Notifications are always better than checking" | Notifications need more setup & safety rules — checking is simpler for non-urgent data
+"Once we integrate, we're done" | Partners change rules, hit speed limits at scale, and go down — integrations need ongoing attention
+E
+EXAMPLE
+A PM who asks the engineering team to break down integration work into these 6 steps — instead of accepting 'it's just an API call' — earns credibility and avoids mid-project surprises.
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 12 ===
+WRAP-UP
+Key Takeaways & Simple Glossary
+FOUR THINGS TO REMEMBER
+API = Menu
+It's a menu of what
+one system offers
+to another
+Check Before
+You Promise
+Ask the 5 questions
+before putting any
+integration on the roadmap
+Urgent = Notify
+Not Urgent = Check
+Payment updates need
+instant notifications;
+weekly reports can wait
+Integrations Are
+Ongoing Work
+Partners change rules,
+prices change, things
+break — plan for it
+SIMPLE GLOSSARY — 15 TERMS YOU'LL HEAR IN MEETINGS
+API  —  A menu of services one app offers to another
+Endpoint  —  The specific address you call (like a URL)
+API Key  —  A password that proves you're allowed to call
+Status Code  —  A number that tells you if it worked (200) or failed (400, 500)
+Rate Limit  —  A speed limit — max calls allowed per minute
+REST  —  The most common way to design APIs (90%+ of apps use it)
+JSON  —  The standard format for sending data back and forth
+Webhook  —  An instant notification from a partner when something happens
+Polling  —  Repeatedly checking for updates ("anything new yet?")
+Authentication  —  How you prove who you are when calling an API
+Integration  —  Connecting your app to a partner's service via their API
+Vendor Lock-in  —  When switching away from a partner becomes very expensive
+Uptime Promise (SLA)  —  A partner's guarantee of how often their service is available
+Data Contract  —  The agreed format of data a partner will send/receive
+Retry Logic  —  Automatically trying again when a call fails
+PM2-03 & PM2-04  |  APIs & Integrations  |  HSB — Product Management II
+
+=== SLIDE 13 ===
+Thank You
+APIs & Integrations  —  PM2-03 & PM2-04
+Next: PM2-05 & PM2-06  ·  Databases & Data Modeling
+HSB — Product Management II  |  Dr. Anand Fadte
+

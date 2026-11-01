@@ -1,0 +1,415 @@
+=== SLIDE 1 ===
+PM2-05 & PM2-06  ·  COMBINED OVERVIEW
+Databases & Data Modeling
+Tables, Queries & Analytics every PM must understand
+Dr. Anand Fadte
+
+=== SLIDE 2 ===
+SESSION ROADMAP
+What We Will Cover Today
+01
+What Is a Database?
+Tables, rows, columns, keys
+02
+SQL vs NoSQL
+When to pick which
+03
+Reading ER Diagrams
+Boxes, lines, relationships
+04
+Normalization Basics
+Flat table to clean schema
+05
+SQL for PMs
+SELECT, JOIN, GROUP BY
+06
+Analytics Instrumentation
+Events, properties, tracking
+07
+Data Pipelines
+ETL, batch vs streaming
+08
+Schema as Product Decision
+When data model = bottleneck
+09
+Case Studies & India Examples
+Real-world database decisions
+10
+Key Takeaways & Glossary
+20 essential terms
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 3 ===
+FOUNDATIONS
+What Is a Database?
+CORE IDEA
+A database is a strict spreadsheet — it enforces rules (types, uniqueness, relationships) that a spreadsheet does not.
+Table
+One entity type
+(Users, Orders)
+Row
+One record
+(a single user)
+Column
+One attribute
+(name, email)
+Primary Key
+Unique ID for
+each row
+Foreign Key
+Links one table
+to another
+WHY PMs CARE
+Data persists after page refresh  —  unlike browser memory or session state
+Foreign keys enforce business rules  —  "every order must have a customer"
+Schema = the contract your app lives by  —  change it wrong and features break
+Indexes speed up search  —  without them, the DB scans every row (slow)
+E
+EXAMPLE
+Swiggy stores Users, Restaurants, Orders, Deliveries as separate tables linked by foreign keys — one user can have hundreds of orders without duplicating their name or address in every row.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 4 ===
+CHOOSING YOUR DATABASE
+SQL vs NoSQL — When to Pick Which
+Dimension | SQL (Relational) | NoSQL (Non-Relational)
+Schema | Fixed schema, structured | Flexible / schema-less
+Scaling | Vertical (bigger server) | Horizontal (more servers)
+Relationships | JOINs across tables | Embedded / denormalized
+Best For | Transactions, reporting | Real-time, high volume
+Examples | PostgreSQL, MySQL | MongoDB, DynamoDB, Redis
+Think of it as | Spreadsheet with rules | Filing cabinet of documents
+PM DECISION FRAMEWORK — WHEN TO SUGGEST WHAT
+Pick SQL When
+Strict data integrity needed (finance, healthcare)
+Complex queries & reporting
+ACID transactions required
+Pick NoSQL When
+Massive scale, flexible schema needed
+Real-time feeds, IoT sensor data
+Rapid prototyping / schema evolving fast
+E
+EXAMPLE
+Amazon built DynamoDB (NoSQL) because relational DBs couldn't handle Black Friday traffic — 72M requests/sec during peak. Flipkart uses both: PostgreSQL for payments, MongoDB for product catalog.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 5 ===
+DATA MODELING
+Reading ER Diagrams
+WHAT IS AN ER DIAGRAM?
+Entity-Relationship diagrams show which tables exist, what columns they have, and how they connect. It's the "map" of your database.
+Box = Table
+Each box is one entity
+(Users, Products, Orders)
+Line = Relationship
+Connects two tables
+via foreign key
+Crow's Foot = Many
+One user can have
+many orders (1:N)
+SAMPLE ER DIAGRAM — E-COMMERCE
+USERS
+user_id  (PK)
+name
+email
+city
+ORDERS
+order_id  (PK)
+user_id  (FK)
+product_id  (FK)
+amount
+order_date
+PRODUCTS
+product_id  (PK)
+price
+category
+1 : N
+N : 1
+PM Test: "Does the data I need for this feature already exist in the schema?  If not, what tables and columns are needed?"
+E
+EXAMPLE
+Before building a 'Reorder' feature, the PM checks the ER diagram — Orders table already has product_id and user_id. No schema change needed, just a new query.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 6 ===
+DATA DESIGN
+Normalization — Why We Split Tables
+THE PROBLEM: FLAT (DENORMALIZED) TABLE
+order_id | customer_name | customer_email | product | price
+1001 | Priya Sharma | priya@gmail.com | iPhone 15 | 79,999
+1002 | Priya Sharma | priya@gmail.com | AirPods | 14,999
+1003 | Rahul Gupta | rahul@gmail.com | MacBook Air | 1,14,999
+Priya's name & email are duplicated!
+Problems: wasted storage, update anomalies
+(change email in one row but not the other),
+delete anomalies (delete last order = lose customer)
+NORMALIZE
+THE SOLUTION: NORMALIZED TABLES (LINKED BY FOREIGN KEYS)
+user_id (PK) | name | email
+U1 | Priya Sharma | priya@gmail.com
+U2 | Rahul Gupta | rahul@gmail.com
+order_id (PK) | user_id (FK) | product | price
+1001 | U1 | iPhone 15 | 79,999
+1002 | U1 | AirPods | 14,999
+1003 | U2 | MacBook Air | 1,14,999
+PM TAKEAWAY
+No Duplication
+Each fact stored
+once
+Easy Updates
+Change email in
+one place
+Data Integrity
+FK prevents
+orphan records
+Trade-off
+More tables =
+more JOINs
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 7 ===
+SQL FLUENCY
+The 5 SQL Commands Every PM Should Know
+Command | What It Does | Plain English | Example
+SELECT | Choose columns | "Show me these fields" | SELECT name, email
+FROM | Pick the table | "Look in this table" | FROM users
+WHERE | Filter rows | "Only rows matching..." | WHERE city = 'Mumbai'
+JOIN | Combine tables | "Connect related data" | JOIN orders ON users.id = orders.user_id
+GROUP BY | Aggregate | "Summarize by category" | GROUP BY city
+PUTTING IT TOGETHER — A REAL PM QUERY
+SELECT  city, COUNT(*) AS total_orders, SUM(amount) AS revenue
+FROM    orders
+JOIN    users ON orders.user_id = users.user_id
+WHERE   order_date >= '2024-01-01'
+GROUP BY city
+ORDER BY revenue DESC;
+What this gives you:
+Total orders and revenue per city
+since Jan 2024, sorted highest first.
+
+PM use case: "Which cities should we
+expand delivery to next?"
+You don't need to write production SQL — you need to read a query, understand a dashboard, and ask the right data question.
+E
+EXAMPLE
+A PM at Zomato pulls this exact query pattern to compare city-wise order trends before deciding where to launch a new cuisine vertical.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 8 ===
+MEASUREMENT
+Analytics Instrumentation — Events, Properties & Tracking
+THE TWO BUILDING BLOCKS
+Event
+"Something happened"
+button_clicked, page_viewed,
+order_placed, search_performed
+Property
+"Context about what happened"
+button_name, page_url,
+order_amount, search_query
+TRACKING PLAN — THE PM's INSTRUMENTATION SPEC
+Event Name | When Fired | Properties | Why Track It
+signup_completed | User finishes registration | method, referral_source | Measure funnel conversion
+product_viewed | User opens product page | product_id, category, price | Feed recommendation engine
+cart_abandoned | User leaves with items in cart | cart_value, item_count | Trigger re-engagement
+order_placed | Payment confirmed | amount, payment_method, city | Revenue & geo analytics
+THE GOLDEN RULE
+If you didn't instrument it before launch, you can't measure it after.  Retroactive tracking = impossible for past users.
+E
+EXAMPLE
+Instagram's PM team instruments every scroll depth, tap, and share — if a Reel gets 3-sec views but no shares, the algorithm deprioritizes it. Without properties on each event, they'd just see "video_played" with no context.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 9 ===
+DATA FLOW
+Data Pipelines — From Raw Data to Dashboards
+HOW DATA MOVES
+Source
+App DB, APIs,
+logs, sensors
+Extract
+Pull raw data
+from sources
+Transform
+Clean, join,
+aggregate
+Load
+Store in data
+warehouse
+Dashboard
+Visualize for
+decision-making
+BATCH vs STREAMING
+Dimension | Batch Processing | Stream Processing
+Frequency | Hourly / daily / weekly | Real-time (seconds)
+Latency | Minutes to hours | Milliseconds to seconds
+Use Case | Monthly reports, ML training | Fraud detection, live dashboards
+Cost | Lower (scheduled) | Higher (always running)
+Example | Flipkart daily sales report | PhonePe fraud alert in 2 sec
+PM QUESTION TO ASK
+"What is the acceptable data latency for this feature?  Does the user need real-time, or is daily-refresh good enough?"
+E
+EXAMPLE
+Airbnb built Minerva — a semantic layer on top of their data warehouse — so every team defines 'revenue' the same way. Before that, 3 teams had 3 different revenue numbers.
+
+=== SLIDE 10 ===
+PRODUCT IMPACT
+Schema as a Product Decision
+WHEN THE DATA MODEL BECOMES THE BOTTLENECK
+Your schema is not just an engineering concern — it determines what features you can build quickly and what takes months.
+Scenario | Schema Implication | PM Decision
+Add "Save for Later" feature | Need new table: wishlists (user_id FK, product_id FK) | 1-sprint — schema exists, just a new table
+Support multiple addresses | Users table has one address column → needs new addresses table | Needs migration — plan 2 sprints
+Add product reviews | New reviews table + ratings aggregation | Can ship MVP with flat table, normalize later
+Multi-currency pricing | Price column is single currency → need currency table + exchange rates | Major schema change — 3-4 sprint effort
+SCHEMA MIGRATION — THE CHANGE PROCESS
+1. Plan
+PM + Eng review
+impacted tables
+2. Write Migration
+SQL script to
+alter/add tables
+3. Test
+Run on staging
+with real data
+4. Deploy
+Run on production
+(often off-peak)
+5. Verify
+Check no data
+lost or corrupted
+The "1-day vs 2-sprint" test:  Check the ER diagram — if the data already exists, it's a query change (fast). If you need new tables or columns, it's a migration (slow).
+E
+EXAMPLE
+WhatsApp kept a simple schema for years — messages table with sender, receiver, timestamp, content. When they added 'Communities', they needed a complete group-hierarchy schema rewrite — a 6-month effort.
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 11 ===
+REAL-WORLD DECISIONS
+Case Studies — Database Choices That Shaped Products
+Amazon DynamoDB
+Challenge: Relational DB couldn't scale for Black Friday
+Decision: Built DynamoDB (NoSQL) in-house
+Result: 72.9M requests/sec during peak sales
+PM Lesson: Scale requirements drive DB choice
+Instagram — Postgres at Scale
+Challenge: 2B+ users on PostgreSQL
+Decision: Kept SQL but sharded aggressively
+Result: World's largest Postgres deployment
+PM Lesson: SQL can scale with right engineering
+Flipkart — Big Billion Days
+Challenge: 10x traffic spike during sales
+Decision: Pre-computed read replicas + caching
+Result: Zero downtime during peak
+PM Lesson: Read-heavy = cache + replicas
+Swiggy — Reorder Feature
+Challenge: Build 1-tap reorder from order history
+Decision: Query existing Orders + Products tables
+Result: 15% increase in repeat orders
+PM Lesson: Check schema first — feature may be free
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 12 ===
+INDIA CONTEXT
+Database Decisions in the Indian Tech Ecosystem
+800M+
+Internet users
+in India (2024)
+46B+
+UPI transactions
+per month
+10x
+Traffic spike during
+festival sales
+< 2 sec
+Expected load time
+for Indian users
+HOW INDIAN COMPANIES HANDLE DATA
+Compan | Database Choice | Why | Scale
+PhonePe / UPI | Distributed SQL (CockroachDB) | ACID compliance for payments | 46B txns/month
+Ola Maps | PostGIS (PostgreSQL) | Geospatial queries for rides | 2M+ rides/day
+Zerodha | PostgreSQL + TimescaleDB | Time-series for stock ticks | 15M+ orders/day
+Dream11 | Redis + MongoDB | Real-time fantasy sports scoring | 100M+ users during IPL
+IRCTC | Oracle → modernizing | Tatkal: 25 lakh bookings in minutes | Legacy → cloud migration
+POLYGLOT PERSISTENCE — MOST APPS USE MULTIPLE DATABASES
+PostgreSQL
+Core business data
+(users, orders, payments)
+Redis
+Caching layer
+(session, OTP, cart)
+Elasticsearch
+Search & filtering
+(product search)
+S3 / Blob Store
+Files & media
+(images, documents)
+PM Insight: Don't ask "which database?" — ask "which database for which part of the system?"
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 13 ===
+PITFALLS
+Myths, Realities & Common PM Mistakes
+MYTHS vs REALITY
+Myth | Reality
+"NoSQL is always faster than SQL" | Depends on query pattern — SQL with indexes beats unindexed NoSQL
+"We need real-time data everywhere" | 90% of dashboards are fine with hourly refresh — real-time costs 5-10x more
+"More data = better decisions" | Unstructured data without a tracking plan = noise, not insight
+"Schema changes are quick" | A migration on a 100M-row production table can take hours with downtime risk
+"MongoDB means no schema" | You still need a data model — the DB just won't enforce it for you
+TOP 5 PM MISTAKES WITH DATA
+Launching without a tracking plan  —  you can never measure retroactively what you didn't instrument
+Ignoring schema in sprint planning  —  migration = 2x the effort of a regular feature
+Asking for real-time when daily is enough  —  streaming infra costs 5-10x batch processing
+Not involving data eng early  —  pipeline changes need lead time, not last-sprint surprises
+Confusing warehouse vs production DB  —  running analytics queries on prod DB slows the app
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 14 ===
+WRAP-UP
+Key Takeaways & Essential Glossary
+5 THINGS TO REMEMBER
+Schema = Contract
+Your data model
+defines what's possible
+SQL vs NoSQL
+Not better/worse —
+different trade-offs
+Instrument First
+If you didn't track it,
+you can't measure it
+Check the ER
+Before requesting a feature,
+check if data exists
+Ask About Latency
+Real-time vs batch
+is a cost decision
+ESSENTIAL GLOSSARY — 20 TERMS EVERY PM SHOULD KNOW
+Table  —  Collection of rows for one entity type
+Primary Key (PK)  —  Unique identifier for each row
+Foreign Key (FK)  —  Column linking to another table's PK
+Schema  —  Structure definition of all tables
+Normalization  —  Splitting data to remove duplication
+Denormalization  —  Combining tables for read speed
+Index  —  Speeds up search (like a book index)
+Migration  —  Script that changes the DB schema
+ER Diagram  —  Visual map of tables and relationships
+SQL  —  Structured Query Language for databases
+NoSQL  —  Non-relational databases (flexible schema)
+Data Warehouse  —  Central store for analytics (read-heavy)
+Data Lake  —  Raw data storage (unstructured OK)
+ETL / ELT  —  Extract-Transform-Load pipeline patterns
+Event  —  Analytics: something the user did
+Property  —  Analytics: context on the event
+Tracking Plan  —  Spec listing all events + properties
+Batch Processing  —  Scheduled data runs (hourly/daily)
+Stream Processing  —  Real-time data flow (seconds)
+Semantic Layer  —  Shared definitions for metrics
+PM2-05 & PM2-06  |  Databases & Data Modeling  |  HSB — Product Management II
+
+=== SLIDE 15 ===
+Thank You
+Databases & Data Modeling  —  PM2-05 & PM2-06
+Next Session: PM2-07 & PM2-08  ·  Coming Up
+HSB — Product Management II  |  Dr. Anand Fadte
+
