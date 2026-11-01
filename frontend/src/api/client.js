@@ -65,6 +65,19 @@ export async function generateNotes(materialId, scope = "single") {
   return res.json();
 }
 
+export async function fetchQuizzes(materialId) {
+  const url = materialId ? `${API_BASE}/quizzes?material_id=${materialId}` : `${API_BASE}/quizzes`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Failed to load quizzes");
+  return res.json();
+}
+
+export async function fetchQuiz(quizId) {
+  const res = await fetch(`${API_BASE}/quizzes/${quizId}`);
+  if (!res.ok) throw new Error("Failed to load quiz");
+  return res.json();
+}
+
 export async function generateQuiz(materialId, scope = "single", count = 4) {
   const url = materialId 
     ? `${API_BASE}/quizzes/generate?material_id=${materialId}&scope=${scope}&count=${count}`

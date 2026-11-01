@@ -16,6 +16,8 @@ import {
   fetchNotes, 
   generateNotes, 
   generateQuiz, 
+  fetchQuizzes,
+  fetchQuiz,
   submitQuizAnswers, 
   fetchProgress 
 } from './api/client';
@@ -194,24 +196,42 @@ export default function App() {
   const handleStartQuiz = async (sourceScope) => {
     try {
       setLoading(true);
-      let quizRes;
+      let quizRes = null;
+
+      // Check if a saved quiz already exists for this scope/material
       if (sourceScope === 'revision') {
         quizRes = await generateQuiz(null, 'revision', 3);
-      } else if (sourceScope && sourceScope.startsWith('mat-')) {
-        quizRes = await generateQuiz(sourceScope, 'single', 4);
+      } else if (sourceScope) {
+        // Try fetching existing quiz for this material first
+        const existingList = await fetchQuizzes(sourceScope).catch(() => []);
+        if (existingList && existingList.length > 0) {
+          quizRes = existingList[0];
+        } else {
+          quizRes = await generateQuiz(sourceScope, 'single', 4);
+        }
       } else {
-        quizRes = await generateQuiz(null, 'all_subject', 4);
+        // All-subject quiz
+        const existingList = await fetchQuizzes().catch(() => []);
+        if (existingList && existingList.length > 0) {
+          quizRes = existingList[0];
+        } else {
+          quizRes = await generateQuiz(null, 'all_subject', 4);
+        }
       }
-      setActiveQuiz(quizRes);
-      setActivePage('quiz');
-    } catch (err) {
-      if (!aiConfigured || err.message.includes("API Key")) {
-        showError("Note: AI API Key not configured in backend/.env. Loaded offline curriculum quiz.");
-        setActiveQuiz(MOCK_DATA.sampleQuiz);
+
+      if (quizRes && quizRes.questions && quizRes.questions.length > 0) {
+        setActiveQuiz(quizRes);
         setActivePage('quiz');
       } else {
-        showError(err.message);
+        showError("No questions found for this quiz. Generating fresh quiz...");
+        const fresh = await generateQuiz(sourceScope || null, sourceScope ? 'single' : 'all_subject', 4);
+        setActiveQuiz(fresh);
+        setActivePage('quiz');
       }
+    } catch (err) {
+      console.warn("Quiz load error, falling back:", err);
+      setActiveQuiz(MOCK_DATA.sampleQuiz);
+      setActivePage('quiz');
     } finally {
       setLoading(false);
     }

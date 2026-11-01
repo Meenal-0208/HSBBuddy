@@ -97,6 +97,17 @@ def generate_quiz(
     return quiz
 
 
+@router.get("/api/quizzes", response_model=List[QuizPublic])
+def list_quizzes(
+    material_id: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
+    query = db.query(Quiz)
+    if material_id:
+        query = query.filter(Quiz.material_id == material_id)
+    return query.order_by(Quiz.created_at.desc()).all()
+
+
 @router.get("/api/quizzes/{quiz_id}", response_model=QuizPublic)
 def get_quiz(quiz_id: str, db: Session = Depends(get_db)):
     quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
