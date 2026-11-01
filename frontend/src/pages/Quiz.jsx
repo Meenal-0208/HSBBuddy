@@ -12,6 +12,9 @@ import {
 
 export default function Quiz({ 
   quiz, 
+  materials = [],
+  activeMaterialId,
+  onSelectMaterial,
   onSubmitQuiz, 
   onCancel 
 }) {
@@ -22,13 +25,23 @@ export default function Quiz({
 
   if (!quiz || !quiz.questions || quiz.questions.length === 0) {
     return (
-      <div className="text-center py-16 bg-white rounded-xl border border-slate-200">
-        <HelpCircle className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-        <h3 className="text-base font-bold text-slate-800">No Quiz Selected</h3>
-        <p className="text-xs text-slate-500 mt-1">Please select a course material to start an active recall quiz.</p>
-        <button onClick={onCancel} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-xs font-bold">
-          Back to Dashboard
-        </button>
+      <div className="max-w-2xl mx-auto text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-4">
+        <HelpCircle className="w-12 h-12 text-blue-500 mx-auto" />
+        <h3 className="text-lg font-bold text-slate-800">Select a Course Material to Start Quiz</h3>
+        <p className="text-xs text-slate-500 max-w-md mx-auto">
+          Choose a lecture deck below to practice active recall questions directly grounded in your slides:
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+          {materials.map(m => (
+            <button
+              key={m.id}
+              onClick={() => onSelectMaterial(m.id)}
+              className="px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition"
+            >
+              {m.title}
+            </button>
+          ))}
+        </div>
       </div>
     );
   }

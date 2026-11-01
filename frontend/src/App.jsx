@@ -91,6 +91,16 @@ export default function App() {
         console.warn("Could not load notes:", e);
       }
 
+      // Preload quizzes from backend so Quiz view is never empty
+      try {
+        const existingQuizzes = await fetchQuizzes();
+        if (existingQuizzes && existingQuizzes.length > 0) {
+          setActiveQuiz(existingQuizzes[0]);
+        }
+      } catch (e) {
+        console.warn("Could not load quizzes:", e);
+      }
+
       const prog = await fetchProgress();
       if (prog) {
         setProgressData({
@@ -365,6 +375,9 @@ export default function App() {
         {activePage === 'quiz' && (
           <Quiz 
             quiz={activeQuiz}
+            materials={materials}
+            activeMaterialId={selectedMaterial ? selectedMaterial.id : null}
+            onSelectMaterial={(id) => handleStartQuiz(id)}
             onSubmitQuiz={handleSubmitQuiz}
             onCancel={() => setActivePage('dashboard')}
           />
