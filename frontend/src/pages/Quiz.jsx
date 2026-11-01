@@ -14,74 +14,129 @@ import {
 
 export default function Quiz({ 
   quiz, 
+  quizzes = [],
   materials = [],
   activeMaterialId,
+  onSelectQuiz,
   onSelectMaterial,
   onSubmitQuiz, 
   onCancel 
 }) {
+  const [selectedDeckId, setSelectedDeckId] = useState(activeMaterialId || (materials[0] ? materials[0].id : null));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
   const [revealedHints, setRevealedHints] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // If no quiz selected, show a popup modal deck picker
+  // If no active quiz, show topic & sets picker
   if (!quiz || !quiz.questions || quiz.questions.length === 0) {
-    return (
-      <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-        <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-6">
-          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
-            <HelpCircle className="w-8 h-8" />
-          </div>
+    const activeDeck = materials.find(m => m.id === selectedDeckId) || materials[0];
+    const deckQuizzes = quizzes.filter(q => q.material_id === (activeDeck ? activeDeck.id : null));
 
-          <div>
-            <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
-              Interactive Pop-up Quiz
+    return (
+      <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+        <div className="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 space-y-6 my-auto max-h-[92vh] overflow-y-auto">
+          
+          <div className="text-center space-y-2">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full inline-block">
+              5 Sets of 10 Questions per PPT
             </span>
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-2">
-              Select Which PPT Quiz to Take
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900">
+              Select Course Module & Quiz Set
             </h2>
-            <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto leading-relaxed">
-              5 Dedicated PPT Quizzes • 50 Situational & Case Questions Each (250 Questions Total)
+            <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+              Each lecture deck has 50 questions divided into 5 targeted topic sets (10 questions each) covering every key concept.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-2.5 text-left">
-            {materials.map((m, idx) => (
-              <button
-                key={m.id}
-                onClick={() => onSelectMaterial(m.id)}
-                className="p-3.5 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50/70 text-left transition group flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
-                    {idx + 1}
-                  </div>
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-700">
-                      {m.title}
-                    </div>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[10px] font-extrabold text-blue-600 bg-blue-100/70 px-2 py-0.5 rounded-full">
-                        50 Questions
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        {m.original_filename || m.title}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition" />
-              </button>
-            ))}
+          {/* 1. Deck Selector Tabs */}
+          <div>
+            <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider block mb-2">
+              Step 1: Choose Lecture PPT
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {materials.map((m, idx) => {
+                const isSelected = (selectedDeckId === m.id) || (!selectedDeckId && idx === 0);
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => setSelectedDeckId(m.id)}
+                    className={`p-3 rounded-2xl border-2 text-left transition text-xs font-bold ${
+                      isSelected 
+                        ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-xs' 
+                        : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase font-black text-blue-600">Deck {idx + 1}</div>
+                    <div className="truncate mt-0.5">{m.title}</div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <button
-            onClick={onCancel}
-            className="text-xs font-bold text-slate-400 hover:text-slate-600"
-          >
-            Cancel and Return to Dashboard
-          </button>
+          {/* 2. Sets List for Selected Deck */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-extrabold uppercase text-slate-400 tracking-wider">
+                Step 2: Choose Quiz Set (10 Questions Each)
+              </label>
+              <span className="text-[11px] font-extrabold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full">
+                {deckQuizzes.length} Sets Available
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-2.5">
+              {deckQuizzes.map((qSet, idx) => {
+                // Strip deck title from title string for clean display
+                const cleanTitle = qSet.title.includes("•") 
+                  ? qSet.title.split("•")[1].trim() 
+                  : qSet.title;
+
+                return (
+                  <button
+                    key={qSet.id}
+                    onClick={() => {
+                      if (onSelectQuiz) {
+                        onSelectQuiz(qSet.id);
+                      } else {
+                        onSelectMaterial(qSet.id);
+                      }
+                    }}
+                    className="p-3.5 rounded-2xl border-2 border-slate-200 hover:border-blue-500 hover:bg-blue-50/60 text-left transition group flex items-center justify-between bg-white"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-8 h-8 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black text-xs shrink-0 group-hover:bg-blue-600 group-hover:text-white transition">
+                        {idx + 1}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs sm:text-sm font-bold text-slate-900 group-hover:text-blue-700 truncate">
+                          {cleanTitle}
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-400">
+                          <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">
+                            10 Questions
+                          </span>
+                          <span>Complete Syllabus Coverage</span>
+                        </div>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition shrink-0 ml-2" />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="text-center pt-2">
+            <button
+              onClick={onCancel}
+              className="text-xs font-bold text-slate-400 hover:text-slate-600"
+            >
+              Cancel and Return to Dashboard
+            </button>
+          </div>
+
         </div>
       </div>
     );
@@ -143,25 +198,31 @@ export default function Quiz({
     <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden my-auto">
         
-        {/* Modal Top Header with Topic Selector */}
+        {/* Modal Top Header with Topic & Set Selector */}
         <div className="p-4 sm:p-5 bg-slate-900 text-white flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-500/30 text-blue-300">
                 <Sparkles className="w-3 h-3" />
-                Case Challenge ({total} Questions)
+                Set Challenge (10 Questions)
               </span>
               <span className="text-[10px] text-slate-400">
-                Switch Deck:
+                Switch Set:
               </span>
               <select
-                value={activeMaterialId || (quiz.materialId || "")}
-                onChange={(e) => onSelectMaterial(e.target.value || null)}
-                className="bg-slate-800 text-blue-300 border border-slate-700 text-xs font-bold rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer"
+                value={quiz.id}
+                onChange={(e) => {
+                  if (onSelectQuiz) {
+                    onSelectQuiz(e.target.value);
+                  } else {
+                    onSelectMaterial(e.target.value);
+                  }
+                }}
+                className="bg-slate-800 text-blue-300 border border-slate-700 text-xs font-bold rounded-lg px-2.5 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer max-w-[260px] truncate"
               >
-                {materials.map((m) => (
-                  <option key={m.id} value={m.id} className="bg-slate-900 text-white">
-                    {m.title}
+                {quizzes.map((q) => (
+                  <option key={q.id} value={q.id} className="bg-slate-900 text-white">
+                    {q.title}
                   </option>
                 ))}
               </select>

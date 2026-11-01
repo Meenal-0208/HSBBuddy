@@ -105,7 +105,7 @@ def list_quizzes(
     query = db.query(Quiz)
     if material_id:
         query = query.filter(Quiz.material_id == material_id)
-    return query.order_by(Quiz.created_at.desc()).all()
+    return query.order_by(Quiz.created_at.asc()).all()
 
 
 @router.get("/api/quizzes/{quiz_id}", response_model=QuizPublic)

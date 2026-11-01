@@ -31,6 +31,7 @@ export default function App() {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
   const [notesData, setNotesData] = useState({});
   const [activeQuiz, setActiveQuiz] = useState(null);
+  const [allQuizzes, setAllQuizzes] = useState([]);
   const [latestResult, setLatestResult] = useState(null);
   const [progressData, setProgressData] = useState({
     recent_attempts: [],
@@ -91,9 +92,12 @@ export default function App() {
         console.warn("Could not load notes:", e);
       }
 
-      // Don't auto-force the first quiz so user always gets the interactive topic picker
+      // Load all available quiz sets from backend
       try {
-        await fetchQuizzes();
+        const qList = await fetchQuizzes();
+        if (qList && qList.length > 0) {
+          setAllQuizzes(qList);
+        }
       } catch (e) {
         console.warn("Could not load quizzes:", e);
       }
@@ -200,38 +204,42 @@ export default function App() {
     }
   };
 
-  const handleStartQuiz = async (sourceScope) => {
+  const handleStartQuiz = async (param) => {
     try {
       setLoading(true);
       let quizRes = null;
 
-      // Check if a saved quiz already exists for this scope/material
-      if (sourceScope === 'revision') {
-        quizRes = await generateQuiz(null, 'revision', 3);
-      } else if (sourceScope) {
-        // Try fetching existing quiz for this material first
-        const existingList = await fetchQuizzes(sourceScope).catch(() => []);
-        if (existingList && existingList.length > 0) {
-          quizRes = existingList[0];
-        } else {
-          quizRes = await generateQuiz(sourceScope, 'single', 4);
-        }
+      if (!param) {
+        // If no parameter passed, show topic picker
+        setActiveQuiz(null);
+        setActivePage('quiz');
+        return;
+      }
+
+      // Check if param is a direct quiz ID (check if it exists in allQuizzes)
+      const foundDirect = allQuizzes.find(q => q.id === param);
+      if (foundDirect) {
+        const fullQuiz = await fetchQuiz(param).catch(() => foundDirect);
+        setActiveQuiz(fullQuiz);
+        setActivePage('quiz');
+        return;
+      }
+
+      // If param is a materialId, fetch quizzes for that material
+      const existingList = await fetchQuizzes(param).catch(() => []);
+      if (existingList && existingList.length > 0) {
+        // fetch the full quiz with questions
+        quizRes = await fetchQuiz(existingList[0].id).catch(() => existingList[0]);
       } else {
-        // All-subject quiz
-        const existingList = await fetchQuizzes().catch(() => []);
-        if (existingList && existingList.length > 0) {
-          quizRes = existingList[0];
-        } else {
-          quizRes = await generateQuiz(null, 'all_subject', 4);
-        }
+        quizRes = await generateQuiz(param, 'single', 10);
       }
 
       if (quizRes && quizRes.questions && quizRes.questions.length > 0) {
         setActiveQuiz(quizRes);
         setActivePage('quiz');
       } else {
-        showError("No questions found for this quiz. Generating fresh quiz...");
-        const fresh = await generateQuiz(sourceScope || null, sourceScope ? 'single' : 'all_subject', 4);
+        showError("Loading quiz questions...");
+        const fresh = await generateQuiz(param, 'single', 10);
         setActiveQuiz(fresh);
         setActivePage('quiz');
       }
@@ -377,8 +385,10 @@ export default function App() {
         {activePage === 'quiz' && (
           <Quiz 
             quiz={activeQuiz}
+            quizzes={allQuizzes}
             materials={materials}
             activeMaterialId={selectedMaterial ? selectedMaterial.id : null}
+            onSelectQuiz={(quizId) => handleStartQuiz(quizId)}
             onSelectMaterial={(id) => handleStartQuiz(id)}
             onSubmitQuiz={handleSubmitQuiz}
             onCancel={() => setActivePage('dashboard')}
