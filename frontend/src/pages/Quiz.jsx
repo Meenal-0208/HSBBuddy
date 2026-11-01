@@ -5,9 +5,11 @@ import {
   ChevronRight, 
   ChevronLeft, 
   CheckCircle, 
-  AlertCircle,
+  X, 
   Sparkles,
-  ArrowRight
+  Layers,
+  Award,
+  BookOpen
 } from 'lucide-react';
 
 export default function Quiz({ 
@@ -19,28 +21,72 @@ export default function Quiz({
   onCancel 
 }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState({}); // { [questionId]: optionId or array of optionIds }
-  const [revealedHints, setRevealedHints] = useState({}); // { [questionId]: boolean }
+  const [userAnswers, setUserAnswers] = useState({});
+  const [revealedHints, setRevealedHints] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // If no quiz selected, show a popup modal deck picker
   if (!quiz || !quiz.questions || quiz.questions.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm p-8 space-y-4">
-        <HelpCircle className="w-12 h-12 text-blue-500 mx-auto" />
-        <h3 className="text-lg font-bold text-slate-800">Select a Course Material to Start Quiz</h3>
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
-          Choose a lecture deck below to practice active recall questions directly grounded in your slides:
-        </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          {materials.map(m => (
+      <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
+        <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 text-center space-y-6">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-inner">
+            <HelpCircle className="w-8 h-8" />
+          </div>
+
+          <div>
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full">
+              Interactive Pop-up Quiz
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-3">
+              Select a Topic to Start Quiz
+            </h2>
+            <p className="text-xs text-slate-500 mt-1.5 max-w-md mx-auto leading-relaxed">
+              Analytical and situational case questions testing real system design, error codes, and architectural trade-offs.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2.5 text-left">
+            {materials.map((m) => (
+              <button
+                key={m.id}
+                onClick={() => onSelectMaterial(m.id)}
+                className="p-3.5 rounded-xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/70 text-left transition group flex items-center justify-between"
+              >
+                <div>
+                  <div className="text-xs font-bold text-slate-800 group-hover:text-blue-700">
+                    {m.title}
+                  </div>
+                  <div className="text-[11px] text-slate-400 mt-0.5">
+                    {m.slidesCount > 0 ? `${m.slidesCount} slides covered` : 'Lecture deck'}
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 transition" />
+              </button>
+            ))}
+
             <button
-              key={m.id}
-              onClick={() => onSelectMaterial(m.id)}
-              className="px-3 py-2 text-xs font-semibold rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 transition"
+              onClick={() => onSelectMaterial(null)}
+              className="p-3.5 rounded-xl border-2 border-dashed border-indigo-200 bg-indigo-50/50 hover:bg-indigo-100/60 text-left transition flex items-center justify-between"
             >
-              {m.title}
+              <div>
+                <div className="text-xs font-black text-indigo-900">
+                  🌟 Comprehensive Quiz (All Topics Combined)
+                </div>
+                <div className="text-[11px] text-indigo-600">
+                  Strategic cross-deck questions
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-indigo-500" />
             </button>
-          ))}
+          </div>
+
+          <button
+            onClick={onCancel}
+            className="text-xs font-bold text-slate-400 hover:text-slate-600"
+          >
+            Cancel and Return to Dashboard
+          </button>
         </div>
       </div>
     );
@@ -50,7 +96,6 @@ export default function Quiz({
   const total = quiz.questions.length;
   const isLast = currentIndex === total - 1;
 
-  // Single select handler
   const handleSingleSelect = (optionId) => {
     setUserAnswers(prev => ({
       ...prev,
@@ -58,7 +103,6 @@ export default function Quiz({
     }));
   };
 
-  // Multiple select handler (checkboxes)
   const handleMultipleSelect = (optionId) => {
     const currentList = Array.isArray(userAnswers[currentQ.id]) ? userAnswers[currentQ.id] : [];
     let updated;
@@ -87,7 +131,7 @@ export default function Quiz({
       onSubmitQuiz({
         quizId: quiz.id,
         quizTitle: quiz.title,
-        source: quiz.sourceMaterial,
+        source: quiz.sourceMaterial || "Course Lecture Deck",
         answers: userAnswers,
         quiz
       });
@@ -100,110 +144,120 @@ export default function Quiz({
   }).length;
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Quiz Progress Top Bar */}
-      <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between gap-4">
-        <div>
-          <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600">
-            {quiz.sourceMaterial}
-          </span>
-          <h2 className="text-base font-bold text-slate-900">{quiz.title}</h2>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="text-right">
-            <div className="text-xs font-bold text-slate-800">
-              Question {currentIndex + 1} of {total}
+    /* Fullscreen Modal Backdrop: Interactive Pop-up Quiz */
+    <div className="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden my-auto">
+        
+        {/* Modal Top Header */}
+        <div className="p-5 sm:p-6 bg-slate-900 text-white flex items-center justify-between shrink-0">
+          <div className="min-w-0 pr-4">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-blue-500/30 text-blue-300 mb-1">
+              <Sparkles className="w-3 h-3" />
+              Pop-up Case Challenge
             </div>
-            <div className="text-[11px] text-slate-400">
-              {answeredCount} of {total} answered
-            </div>
+            <h2 className="text-base sm:text-lg font-black truncate text-white">
+              {quiz.title}
+            </h2>
           </div>
-          <button
-            onClick={onCancel}
-            className="text-xs text-slate-400 hover:text-slate-600 font-semibold px-2 py-1 rounded"
-          >
-            Exit
-          </button>
-        </div>
-      </div>
 
-      {/* Question Card */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 space-y-6">
-        {/* Question Type & Source Pill */}
-        <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-4">
-          <span className="text-xs font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700 uppercase">
-            {currentQ.type === 'single' ? 'Single Choice MCQ' :
-             currentQ.type === 'multiple' ? 'Multiple Selection (Select all)' : 'True / False'}
-          </span>
-          {currentQ.conceptTag && (
-            <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md">
-              Tag: {currentQ.conceptTag}
-            </span>
-          )}
-        </div>
-
-        {/* Prompt */}
-        <h3 className="text-lg md:text-xl font-bold text-slate-900 leading-snug">
-          {currentQ.prompt}
-        </h3>
-
-        {/* Options */}
-        <div className="space-y-3">
-          {currentQ.options.map((opt) => {
-            const isSingleOrTF = currentQ.type === 'single' || currentQ.type === 'true_false';
-            const isSelected = isSingleOrTF 
-              ? userAnswers[currentQ.id] === opt.id
-              : Array.isArray(userAnswers[currentQ.id]) && userAnswers[currentQ.id].includes(opt.id);
-
-            return (
-              <div
-                key={opt.id}
-                onClick={() => isSingleOrTF ? handleSingleSelect(opt.id) : handleMultipleSelect(opt.id)}
-                className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-3.5 ${
-                  isSelected 
-                    ? 'border-blue-600 bg-blue-50/70 text-blue-950 font-semibold shadow-xs' 
-                    : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
-                }`}
-              >
-                <div className={`w-5 h-5 rounded-md flex items-center justify-center border font-bold text-xs ${
-                  isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-400'
-                }`}>
-                  {opt.id}
-                </div>
-                <div className="text-sm leading-relaxed">{opt.text}</div>
+          <div className="flex items-center gap-3 shrink-0">
+            {/* Progress indicator */}
+            <div className="hidden sm:block text-right">
+              <div className="text-xs font-extrabold text-blue-400">
+                Question {currentIndex + 1} of {total}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Hidden Hint Accordion */}
-        <div className="pt-2">
-          {!revealedHints[currentQ.id] ? (
-            <button
-              onClick={toggleHint}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg transition"
-            >
-              <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
-              Need a hint? (Does not reveal answer)
-            </button>
-          ) : (
-            <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-3">
-              <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-              <div>
-                <span className="font-bold">Hint: </span>
-                {currentQ.hint}
+              <div className="text-[10px] text-slate-400">
+                {answeredCount} answered
               </div>
             </div>
-          )}
+
+            <button
+              onClick={onCancel}
+              className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition"
+              title="Close Quiz"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
-        {/* Footer Navigation Buttons */}
-        <div className="flex items-center justify-between pt-6 border-t border-slate-100">
+        {/* Modal Content Body */}
+        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1">
+          {/* Tag & Type Header */}
+          <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3">
+            <span className="text-[11px] font-extrabold uppercase px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+              {currentQ.type === 'single' ? 'Single Choice Case' :
+               currentQ.type === 'multiple' ? 'Multiple Selection (Select all)' : 'Logical True / False'}
+            </span>
+            {currentQ.conceptTag && (
+              <span className="text-[11px] font-bold text-slate-500">
+                Topic: {currentQ.conceptTag}
+              </span>
+            )}
+          </div>
+
+          {/* Prompt */}
+          <div className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed whitespace-pre-wrap">
+            {currentQ.prompt}
+          </div>
+
+          {/* Options */}
+          <div className="space-y-3">
+            {currentQ.options.map((opt) => {
+              const isSingleOrTF = currentQ.type === 'single' || currentQ.type === 'true_false';
+              const isSelected = isSingleOrTF 
+                ? userAnswers[currentQ.id] === opt.id
+                : Array.isArray(userAnswers[currentQ.id]) && userAnswers[currentQ.id].includes(opt.id);
+
+              return (
+                <div
+                  key={opt.id}
+                  onClick={() => isSingleOrTF ? handleSingleSelect(opt.id) : handleMultipleSelect(opt.id)}
+                  className={`p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-start gap-3.5 ${
+                    isSelected 
+                      ? 'border-blue-600 bg-blue-50 text-blue-950 font-semibold shadow-xs' 
+                      : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <div className={`w-5 h-5 rounded-md flex items-center justify-center border font-bold text-xs shrink-0 mt-0.5 ${
+                    isSelected ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 text-slate-400'
+                  }`}>
+                    {opt.id}
+                  </div>
+                  <div className="text-xs sm:text-sm leading-relaxed">{opt.text}</div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Hidden Hint Disclosure */}
+          <div className="pt-1">
+            {!revealedHints[currentQ.id] ? (
+              <button
+                onClick={toggleHint}
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl transition"
+              >
+                <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
+                Need a strategic hint? (Does not reveal answer)
+              </button>
+            ) : (
+              <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-2.5">
+                <Lightbulb className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-extrabold">Strategic Hint: </span>
+                  {currentQ.hint}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Modal Bottom Footer Navigation */}
+        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
           <button
             onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
             disabled={currentIndex === 0}
-            className="px-4 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center gap-1.5 disabled:opacity-30"
+            className="px-4 py-2 text-xs font-bold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition flex items-center gap-1.5 disabled:opacity-30 shadow-xs"
           >
             <ChevronLeft className="w-4 h-4" /> Previous
           </button>
@@ -221,11 +275,12 @@ export default function Quiz({
               disabled={isSubmitting}
               className="px-6 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition flex items-center gap-2 shadow"
             >
-              {isSubmitting ? 'Submitting & Grading...' : 'Submit Quiz for Grading'}
+              {isSubmitting ? 'Grading Answers...' : 'Submit Pop-up Quiz'}
               <CheckCircle className="w-4 h-4" />
             </button>
           )}
         </div>
+
       </div>
     </div>
   );
