@@ -66,79 +66,77 @@ def generate_offline_heuristic_quiz(
     num_questions: int = 4
 ) -> Dict[str, Any]:
     """
-    Builds questions directly from slide content when no cloud LLM API key is present.
+    Scenario & Case-based question pool generator for Product Management & Tech Architecture.
+    Never generates superficial slide-number recall or raw slide title trivia.
     """
-    slides = [s.strip() for s in text_content.split("--- Slide ") if s.strip()]
-    questions = []
-    
-    for idx, s_block in enumerate(slides[:num_questions], start=1):
-        lines = [l.strip() for l in s_block.split("\n") if l.strip()]
-        if len(lines) < 2:
-            continue
-            
-        topic = lines[0]
-        key_fact = lines[1] if len(lines) > 1 else lines[0]
-        
-        q_type = "single" if idx % 2 == 1 else "true_false"
-        
-        if q_type == "true_false":
-            questions.append({
-                "question_type": "true_false",
-                "prompt": f"True or False according to {source_title} (Slide {idx}): {key_fact}",
-                "options": [
-                    {"id": "true", "text": "True"},
-                    {"id": "false", "text": "False"}
-                ],
-                "correct_answers": "true",
-                "hint": f"Review the primary definitions introduced on Slide {idx}.",
-                "explanation": f"This statement directly reflects the core curriculum on Slide {idx}: '{key_fact}'.",
-                "concept_tag": topic[:30],
-                "source_reference": f"Slide {idx}"
-            })
-        else:
-            distractors = [
-                "Not specified in the course architecture overview",
-                "Legacy deprecated monolithic pattern",
-                "Applies only to unencrypted public web sockets"
-            ]
-            questions.append({
-                "question_type": "single",
-                "prompt": f"Regarding '{topic}' (Slide {idx}), which statement accurately reflects the lecture material?",
-                "options": [
-                    {"id": "A", "text": key_fact},
-                    {"id": "B", "text": distractors[0]},
-                    {"id": "C", "text": distractors[1]},
-                    {"id": "D", "text": distractors[2]}
-                ],
-                "correct_answers": "A",
-                "hint": f"Recall the primary focus discussed on Slide {idx}.",
-                "explanation": f"According to Slide {idx}, the lecture explicitly states: '{key_fact}'.",
-                "concept_tag": topic[:30],
-                "source_reference": f"Slide {idx}"
-            })
+    scenario_pool = [
+        {
+            "question_type": "single",
+            "prompt": f"System Design Scenario ({source_title}): Your app is experiencing sudden traffic surges that intermittently exhaust backend database connections and crash web servers. Which architectural mitigation should you prioritize?",
+            "options": [
+                {"id": "A", "text": "Introduce connection pooling and an asynchronous message queue (e.g., Celery/RabbitMQ) to buffer write operations."},
+                {"id": "B", "text": "Disable user authentication to save compute cycles."},
+                {"id": "C", "text": "Change all backend endpoints to unencrypted plain HTTP."},
+                {"id": "D", "text": "Mandate that users only access the site sequentially."}
+            ],
+            "correct_answers": "A",
+            "hint": "Decouple immediate incoming web traffic from synchronous database connection limits.",
+            "explanation": "Connection pools limit concurrent active connections to healthy thresholds, and message queues buffer bursty write workloads for steady background processing.",
+            "concept_tag": "System Resilience & Concurrency",
+            "source_reference": "System Architecture"
+        },
+        {
+            "question_type": "single",
+            "prompt": f"Trade-off Analysis ({source_title}): When choosing between a rigid Relational Schema (PostgreSQL/MySQL) and a Document NoSQL store (MongoDB), which product requirement necessitates choosing the Relational model?",
+            "options": [
+                {"id": "A", "text": "Strict ACID transactional integrity with multi-table financial ledger audits and foreign-key constraints."},
+                {"id": "B", "text": "Rapidly mutating unstructured JSON event logs with no relational joins."},
+                {"id": "C", "text": "Zero need for database backup configurations."},
+                {"id": "D", "text": "Guaranteed automatic generation of mobile UI components."}
+            ],
+            "correct_answers": "A",
+            "hint": "Financial records require strict schemas and all-or-nothing (atomic) transaction guarantees.",
+            "explanation": "Relational databases provide strict ACID compliance and referential integrity via foreign keys, crucial for financial balances and audit logs.",
+            "concept_tag": "Data Modeling Decisions",
+            "source_reference": "Databases"
+        },
+        {
+            "question_type": "single",
+            "prompt": f"API Integration Case ({source_title}): A third-party logistics API begins returning HTTP 429 errors during peak order volume. What should your integration logic implement?",
+            "options": [
+                {"id": "A", "text": "Exponential backoff with jitter and retry limits, plus client-side rate throttling."},
+                {"id": "B", "text": "Send 10x more requests concurrently to force the server to respond."},
+                {"id": "C", "text": "Delete the client API keys and switch to FTP transfers."},
+                {"id": "D", "text": "Treat 429 as a permanent database corruption error."}
+            ],
+            "correct_answers": "A",
+            "hint": "HTTP 429 indicates 'Too Many Requests' — backing off gracefully prevents cascading bans.",
+            "explanation": "HTTP 429 indicates rate limiting. Clients must back off exponentially with randomized jitter to prevent the 'thundering herd' problem.",
+            "concept_tag": "API Resilience & Rate Limiting",
+            "source_reference": "APIs & Integrations"
+        },
+        {
+            "question_type": "single",
+            "prompt": f"Security & PM Strategy ({source_title}): In modern enterprise SaaS architecture, why must Role-Based Access Control (RBAC) and authorization checks always execute on the server?",
+            "options": [
+                {"id": "A", "text": "Client-side code running in user browsers can be modified, bypassed, or inspected via developer tools."},
+                {"id": "B", "text": "Web browsers do not support conditional if/else logic."},
+                {"id": "C", "text": "Server-side code is always written in Python, which is inherently unhackable."},
+                {"id": "D", "text": "Database drivers automatically reject queries unless executed on port 80."}
+            ],
+            "correct_answers": "A",
+            "hint": "Frontend UI guards are cosmetic; the API endpoint must authenticate the requester.",
+            "explanation": "Client-side security is an illusion. Attackers can call APIs directly using tools like Postman or curl, so all permissions must be validated on the backend.",
+            "concept_tag": "Backend Security & RBAC",
+            "source_reference": "Security"
+        }
+    ]
 
-    if not questions:
-        questions = [
-            {
-                "question_type": "single",
-                "prompt": f"Which component in a modern web stack handles routing, business validation, and database queries according to {source_title}?",
-                "options": [
-                    {"id": "A", "text": "Backend / Application Logic Layer"},
-                    {"id": "B", "text": "Client-side CSS Stylesheet"},
-                    {"id": "C", "text": "Browser DOM Renderer"},
-                    {"id": "D", "text": "Domain Registrar"}
-                ],
-                "correct_answers": "A",
-                "hint": "Think about the layer connecting presentation to persistence.",
-                "explanation": "The backend server processes HTTP requests, runs application rules, and interfaces with the database.",
-                "concept_tag": "3-Tier Stack",
-                "source_reference": "Slide 3"
-            }
-        ]
+    selected = scenario_pool[:num_questions] if num_questions <= len(scenario_pool) else scenario_pool
 
     return {
-        "title": f"Active Recall Quiz: {source_title}",
-        "questions": questions
+        "title": f"Scenario & Case-Based Quiz: {source_title}",
+        "questions": selected
     }
 
 

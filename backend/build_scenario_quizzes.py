@@ -261,6 +261,149 @@ def build_scenario_analytical_quizzes():
     ])
 
     # =========================================================================
+    # 3B. TECH STACKS GUIDE: CLOUD, ARCHITECTURE & DEVOPS
+    # =========================================================================
+    q_tech = Quiz(
+        title="Tech Stacks Guide: Architecture & Cloud Decisions",
+        source_scope="single",
+        material_id=m_tech.id
+    )
+    db.add(q_tech)
+    db.commit()
+    db.refresh(q_tech)
+
+    db.add_all([
+        Question(
+            quiz_id=q_tech.id,
+            question_type="single",
+            prompt=(
+                "Scenario: Your B2B SaaS startup is pitching to enterprise healthcare systems and Fortune 500 banks. "
+                "What architectural requirement must your tech stack prioritize to pass enterprise security and procurement audits?"
+            ),
+            options=[
+                {"id": "A", "text": "SOC2/HIPAA compliance readiness, encryption in transit (TLS) and at rest (AES-256), and Role-Based Access Control (RBAC)"},
+                {"id": "B", "text": "Using solely NoSQL databases so schemas never have to be declared"},
+                {"id": "C", "text": "Hosting the entire backend on a single shared VPS to save cloud infrastructure cost"},
+                {"id": "D", "text": "Allowing all microservices to communicate over public HTTP with basic passwords"}
+            ],
+            correct_answers="A",
+            hint="Enterprise procurement audits focus on compliance frameworks, data encryption, and identity management.",
+            explanation="Enterprise readiness requires strict data governance, end-to-end encryption, least-privilege RBAC, and audit logs to pass third-party security certifications (SOC 2, ISO 27001, HIPAA).",
+            concept_tag="Enterprise Readiness & Security",
+            source_reference="Tech Stacks Guide"
+        ),
+        Question(
+            quiz_id=q_tech.id,
+            question_type="single",
+            prompt=(
+                "DevOps Strategy: Releases are breaking in production twice a week because engineers merge code directly without standardized integration testing. "
+                "What is the fundamental PM fix?"
+            ),
+            options=[
+                {"id": "A", "text": "Implement an automated CI/CD pipeline (e.g. GitHub Actions) that enforces linting, automated unit/integration tests, and staging review before any PR can merge"},
+                {"id": "B", "text": "Stop writing automated tests and mandate manual QA testing on production directly"},
+                {"id": "C", "text": "Revert all backend code back to a monolithic architecture written in assembly"},
+                {"id": "D", "text": "Only allow senior engineers to write code while junior engineers manually deploy code via FTP"}
+            ],
+            correct_answers="A",
+            hint="A standard automation pipeline acts as a safety gate for pull requests before code reaches users.",
+            explanation="A robust Continuous Integration / Continuous Deployment (CI/CD) pipeline acts as a safety gate, automatically running unit and integration test suites on every pull request, preventing regression bugs from reaching production.",
+            concept_tag="CI/CD & DevOps Automation",
+            source_reference="Tech Stacks Guide"
+        ),
+        Question(
+            quiz_id=q_tech.id,
+            question_type="single",
+            prompt=(
+                "Containerization & Docker: What primary problem does Docker solve for engineering and product teams during product release cycles?"
+            ),
+            options=[
+                {"id": "A", "text": "It eliminates the 'it works on my machine' bug by packaging software with all its runtime dependencies, OS libraries, and configuration into an immutable container"},
+                {"id": "B", "text": "It automatically rewrites slow SQL queries into fast in-memory lookups"},
+                {"id": "C", "text": "It replaces the need for a web framework like Django, Node, or Go"},
+                {"id": "D", "text": "It makes cloud hosting completely free across all providers"}
+            ],
+            correct_answers="A",
+            hint="Containers encapsulate code alongside operating system dependencies so behavior is reproducible anywhere.",
+            explanation="Containers encapsulate code along with all system dependencies and environment configurations, guaranteeing that code runs identically on a developer's MacBook, the staging environment, and the production Kubernetes cluster.",
+            concept_tag="Containers & Docker",
+            source_reference="Tech Stacks Guide"
+        )
+    ])
+
+    # =========================================================================
+    # 3C. PYTHON TECH STACKS: FRAMEWORKS & CONCURRENCY
+    # =========================================================================
+    q_py = Quiz(
+        title="Python Tech Stack: Framework Selection & Concurrency",
+        source_scope="single",
+        material_id=m_py.id
+    )
+    db.add(q_py)
+    db.commit()
+    db.refresh(q_py)
+
+    db.add_all([
+        Question(
+            quiz_id=q_py.id,
+            question_type="single",
+            prompt=(
+                "Scenario: You are designing a real-time AI Agent platform where each user query makes 3 parallel API calls to external LLMs (latency: 1.5s each). "
+                "Why should you mandate FastAPI over traditional synchronous Flask/Django?"
+            ),
+            options=[
+                {"id": "A", "text": "FastAPI natively leverages Python's async/await (ASGI), allowing worker threads to handle other client requests while waiting on external network I/O without blocking threads"},
+                {"id": "B", "text": "FastAPI compiles Python into machine code, executing CPU-intensive algorithms 100x faster than Flask"},
+                {"id": "C", "text": "Flask is deprecated and cannot make HTTP calls to third-party endpoints"},
+                {"id": "D", "text": "Django cannot connect to relational databases when using AI agents"}
+            ],
+            correct_answers="A",
+            hint="During slow network I/O calls to LLMs, an asynchronous event loop can serve other incoming requests.",
+            explanation="FastAPI is built on Starlette and Pydantic with native ASGI support. During external network requests (like calling OpenAI or Claude APIs), the async event loop pauses the coroutine and continues serving other users, drastically lowering required thread counts and server costs.",
+            concept_tag="FastAPI & Async Concurrency",
+            source_reference="Python Stacks"
+        ),
+        Question(
+            quiz_id=q_py.id,
+            question_type="single",
+            prompt=(
+                "Case Analysis: Your enterprise PM team needs an internal portal with RBAC (Role-Based Access Control), complex relational models, admin dashboards, and database migrations ready in 2 weeks. "
+                "Which Python framework delivers the fastest time-to-market?"
+            ),
+            options=[
+                {"id": "A", "text": "Django ('batteries-included' with built-in ORM, auto-generated admin panel, and robust auth)"},
+                {"id": "B", "text": "Flask (because starting with an empty file is always faster for enterprise auth)"},
+                {"id": "C", "text": "FastAPI (requires manually building admin panels and assembling third-party auth libraries)"},
+                {"id": "D", "text": "Writing raw WSGI handlers without any framework"}
+            ],
+            correct_answers="A",
+            hint="Which framework is famous for 'batteries-included' and has a ready-made admin panel?",
+            explanation="Django follows a 'batteries-included' philosophy. It provides an immediate, battle-tested admin interface, user management/auth, and ORM migrations out of the box, drastically cutting initial MVP lead times for internal tooling.",
+            concept_tag="Django Batteries-Included",
+            source_reference="Python Stacks"
+        ),
+        Question(
+            quiz_id=q_py.id,
+            question_type="single",
+            prompt=(
+                "Language Trade-offs: A junior developer argues that Python should be used for the high-frequency trading engine calculating portfolio risk in sub-millisecond real-time. "
+                "As PM, why do you push back?"
+            ),
+            options=[
+                {"id": "A", "text": "Python is dynamically typed, interpreted, and constrained by the GIL (Global Interpreter Lock), making it unsuited for sub-millisecond CPU-bound compute compared to C++, Rust, or Go"},
+                {"id": "B", "text": "Python cannot perform floating-point arithmetic or matrix multiplications"},
+                {"id": "C", "text": "Python has no libraries for financial math or statistical calculations"},
+                {"id": "D", "text": "Python requires 100x more database connections than compiled languages"}
+            ],
+            correct_answers="A",
+            hint="Consider interpreted overhead and GIL constraints in CPU-heavy sub-millisecond environments.",
+            explanation="Python excels at rapid prototyping, glue code, data science, and async I/O web services. However, for ultra-low latency, CPU-bound execution (like algorithmic trading engines), compiled languages with manual memory control and zero interpreter overhead (Rust, C++, Go) are necessary.",
+            concept_tag="Python GIL & Performance Trade-offs",
+            source_reference="Python Stacks"
+        )
+    ])
+
+    # =========================================================================
     # 4. COMPREHENSIVE PM COURSE QUIZ: STRATEGIC PRODUCT SCENARIOS
     # =========================================================================
     q_all = Quiz(
