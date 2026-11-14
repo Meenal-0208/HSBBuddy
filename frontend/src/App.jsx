@@ -48,6 +48,35 @@ export default function App() {
   const [loading, setLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
 
+  // Dark Mode State with LocalStorage Persistence
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    try {
+      const saved = localStorage.getItem('study_buddy_dark_mode');
+      if (saved !== null) return JSON.parse(saved);
+      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    } catch {
+      return false;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('study_buddy_dark_mode', JSON.stringify(isDarkMode));
+    } catch (e) {
+      console.warn("Could not save dark mode preference:", e);
+    }
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
   const showError = (msg) => {
     setErrorToast(msg);
     setTimeout(() => setErrorToast(null), 5000);
@@ -60,13 +89,26 @@ export default function App() {
       if (health.subject_name) setSubjectName(health.subject_name);
       setAiConfigured(health.ai_configured);
 
-      const mats = await fetchMaterials();
-      if (mats && mats.length > 0) {
+      const matsRaw = await fetchMaterials();
+      const normalizeMat = (m) => ({
+        ...m,
+        filename: m.filename || m.original_filename || m.title,
+        fileType: (m.fileType || m.file_type || 'pptx').toLowerCase(),
+        slidesCount: m.slidesCount ?? m.slides_count ?? 0,
+        uploadDate: m.uploadDate || m.uploaded_at || new Date().toISOString(),
+        size: m.size || (m.file_size_bytes ? `${(m.file_size_bytes / 1024).toFixed(0)} KB` : 'N/A'),
+        extractedPreview: m.extractedPreview || m.extracted_text || ''
+      });
+
+      let mats = [];
+      if (matsRaw && matsRaw.length > 0) {
+        mats = matsRaw.map(normalizeMat);
         setMaterials(mats);
         if (!selectedMaterial) setSelectedMaterial(mats[0]);
       } else {
         // Fallback to sample materials to let the user immediately preview UI
-        setMaterials(MOCK_DATA.materials);
+        mats = MOCK_DATA.materials;
+        setMaterials(mats);
         setSelectedMaterial(MOCK_DATA.materials[0]);
       }
 
@@ -140,17 +182,18 @@ export default function App() {
     setActivePage('material-detail');
   };
 
-  const handleUpload = async (fileObj) => {
+  const handleUpload = async (uploadPayload) => {
     try {
       setLoading(true);
       const formData = new FormData();
-      formData.append('file', fileObj);
-      if (fileObj.customTitle) formData.append('title', fileObj.customTitle);
+      const actualFile = uploadPayload?.file || uploadPayload;
+      const title = uploadPayload?.title || uploadPayload?.customTitle || (actualFile?.name ? actualFile.name.replace(/\.[^/.]+$/, "") : "Uploaded Material");
+      
+      formData.append('file', actualFile);
+      if (title) formData.append('title', title);
 
-      const uploaded = await uploadMaterial(formData);
-      setMaterials(prev => [uploaded, ...prev]);
-      setSelectedMaterial(uploaded);
-      loadInitialData();
+      await uploadMaterial(formData);
+      await loadInitialData();
     } catch (err) {
       showError(err.message);
     } finally {
@@ -307,7 +350,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-900 dark:text-slate-100 transition-colors duration-200">
       <Navbar 
         activePage={activePage} 
         onNavigate={(page) => {
@@ -317,6 +360,8 @@ export default function App() {
           setActivePage(page);
         }} 
         subjectName={subjectName} 
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
       />
 
       {/* Global Error Toast */}
@@ -413,7 +458,7 @@ export default function App() {
         )}
       </main>
 
-      <footer className="border-t border-slate-200 bg-white py-4 text-center text-xs text-slate-400">
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-center text-xs text-slate-400 dark:text-slate-500 transition-colors">
         Personal AI Study Buddy • Single-Subject Dedicated Workspace • Private Local Storage
       </footer>
     </div>

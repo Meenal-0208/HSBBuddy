@@ -14,8 +14,11 @@ import {
   Zap,
   Target,
   ArrowRight,
-  RotateCcw
+  RotateCcw,
+  Heart
 } from 'lucide-react';
+
+import { HelloKitty, MyMelody, Kuromi, Cinnamoroll, Pompompurin, CuteStar, CuteBow } from '../components/SanrioStickers';
 
 export default function Quiz({ 
   quiz, 
@@ -52,51 +55,60 @@ export default function Quiz({
     const deckQuizzes = quizzes.filter(q => q.material_id === (activeDeck ? activeDeck.id : null));
 
     return (
-      <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
-        <div className="bg-white rounded-3xl max-w-4xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden my-auto">
+      <div className="fixed inset-0 z-50 bg-kitty-950/70 dark:bg-kuromi-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
+        <div className="bg-white dark:bg-kuromi-900 rounded-3xl max-w-4xl w-full shadow-pop border-3 border-kitty-200 dark:border-kuromi-700 flex flex-col max-h-[92vh] overflow-hidden my-auto transition-colors relative">
           
+          {/* Top Washi Tape Accent */}
+          <div className="absolute top-2 left-12 w-28 h-4 washi-tape-pink -rotate-2 z-20 opacity-90 rounded-xs pointer-events-none" />
+          <div className="absolute top-2 right-16 w-24 h-4 washi-tape-purple rotate-3 z-20 opacity-80 rounded-xs pointer-events-none" />
+
           {/* Header Banner */}
-          <div className="p-6 sm:p-8 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white relative shrink-0">
+          <div className="p-6 sm:p-7 bg-gradient-to-r from-kitty-100 via-melody-100 to-pompom-100 dark:from-kuromi-950 dark:via-kuromi-900 dark:to-kuromi-950 border-b-2 border-kitty-200 dark:border-kuromi-700 relative shrink-0 pt-7">
             <div className="flex items-start justify-between">
               <div className="space-y-1.5 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/10 text-blue-300 backdrop-blur-md border border-white/10">
-                  <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/90 dark:bg-kuromi-800 text-kitty-600 dark:text-kuromi-300 shadow-pop-sm border border-kitty-200 dark:border-kuromi-600 font-fredoka">
+                  <CuteBow className="w-4 h-4" />
                   Product Management 2 • Master Case Quizzes
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                  Select Lecture PPT & Quiz Set
+                <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 dark:text-white font-fredoka flex items-center gap-2">
+                  <span>Select Lecture PPT & Quiz Set</span>
+                  <CuteStar className="w-5 h-5 animate-spin-slow" />
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                  50 questions per lecture deck divided into 5 targeted topic sets (10 questions each) covering the entire syllabus.
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-quicksand font-bold">
+                  50 questions per lecture deck divided into 5 targeted topic sets (10 questions each) • 2 Easy, 2 Medium & 1 Hard set!
                 </p>
               </div>
 
-              <button
-                onClick={onCancel}
-                className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-slate-300 hover:text-white transition backdrop-blur-md"
-                title="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:block">
+                  <MyMelody className="w-14 h-14 animate-bounce-gentle" />
+                </div>
+                <button
+                  onClick={onCancel}
+                  className="w-10 h-10 rounded-2xl bg-white dark:bg-kuromi-800 hover:bg-kitty-100 dark:hover:bg-kuromi-700 border-2 border-kitty-200 dark:border-kuromi-600 flex items-center justify-center text-slate-600 dark:text-slate-200 shadow-pop-sm transition font-bold"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Modal Interactive Content */}
-          <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1 bg-slate-50/60">
+          <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1 bg-kitty-50/40 dark:bg-kuromi-950/60 transition-colors">
             
             {/* Step 1: Horizontal Deck Selector Cards */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-black">1</span>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-kuromi-300 flex items-center gap-2 font-fredoka">
+                  <span className="w-6 h-6 rounded-full bg-kitty-500 text-white flex items-center justify-center text-xs font-black shadow-pop-sm">1</span>
                   Select Lecture PPT ({materials.length} Decks)
                 </label>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 {materials.map((m, idx) => {
                   const isSelected = (selectedDeckId === m.id) || (!selectedDeckId && idx === 0);
-                  const theme = deckThemes[idx % deckThemes.length];
 
                   return (
                     <button
@@ -104,23 +116,23 @@ export default function Quiz({
                       onClick={() => setSelectedDeckId(m.id)}
                       className={`relative p-3.5 rounded-2xl border-2 text-left transition-all duration-200 flex flex-col justify-between ${
                         isSelected 
-                          ? 'bg-white border-blue-600 shadow-md ring-2 ring-blue-500/20 translate-y-[-2px]' 
-                          : 'bg-white/80 hover:bg-white border-slate-200 hover:border-slate-300 text-slate-600'
+                          ? 'bg-white dark:bg-kuromi-800 border-kitty-500 dark:border-kuromi-400 shadow-pop translate-y-[-2px] ring-2 ring-kitty-400/20' 
+                          : 'bg-white/80 dark:bg-kuromi-900/60 hover:bg-white dark:hover:bg-kuromi-800 border-kitty-100 dark:border-kuromi-800 text-slate-600 dark:text-slate-300'
                       }`}
                     >
                       <div className="flex items-center justify-between mb-2">
-                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
-                          isSelected ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-500'
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-full font-fredoka ${
+                          isSelected ? 'bg-kitty-500 text-white shadow-pop-sm' : 'bg-kitty-100 dark:bg-kuromi-800 text-slate-500 dark:text-slate-400'
                         }`}>
                           Deck {idx + 1}
                         </span>
-                        <div className={`w-2 h-2 rounded-full ${isSelected ? 'bg-blue-600 animate-pulse' : 'bg-transparent'}`} />
+                        <div className={`w-2.5 h-2.5 rounded-full ${isSelected ? 'bg-kitty-500 animate-pulse' : 'bg-transparent'}`} />
                       </div>
-                      <div className="text-xs font-extrabold text-slate-900 leading-snug line-clamp-2">
+                      <div className="text-xs font-black text-slate-900 dark:text-white leading-snug line-clamp-2 font-fredoka">
                         {m.title}
                       </div>
-                      <div className="text-[10px] text-slate-400 font-semibold mt-2">
-                        50 Questions
+                      <div className="text-[10px] text-kitty-600 dark:text-kuromi-400 font-bold mt-2 font-quicksand flex items-center gap-1">
+                        <Heart className="w-2.5 h-2.5 fill-kitty-400 text-kitty-400" /> 50 Questions
                       </div>
                     </button>
                   );
@@ -131,17 +143,27 @@ export default function Quiz({
             {/* Step 2: 5 Targeted Quiz Sets for Active Deck */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-xs font-black uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-                  <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[11px] font-black">2</span>
+                <label className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-kuromi-300 flex items-center gap-2 font-fredoka">
+                  <span className="w-6 h-6 rounded-full bg-melody-500 text-white flex items-center justify-center text-xs font-black shadow-pop-sm">2</span>
                   Select Topic Set (10 Questions Each)
                 </label>
-                <span className="text-xs font-extrabold text-indigo-700 bg-indigo-50 border border-indigo-200 px-3 py-1 rounded-full">
-                  {deckQuizzes.length} Topic Sets Available
+                <span className="text-xs font-black text-melody-600 dark:text-kuromi-300 bg-melody-50 dark:bg-kuromi-800/80 border-2 border-melody-200 dark:border-kuromi-700 px-3 py-1 rounded-full font-fredoka shadow-pop-sm">
+                  {deckQuizzes.length} Topic Sets Ready ✨
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 {deckQuizzes.map((qSet, idx) => {
+                  let diff = "Easy";
+                  if (qSet.title.toLowerCase().includes("[hard]")) diff = "Hard";
+                  else if (qSet.title.toLowerCase().includes("[medium]")) diff = "Medium";
+
+                  const diffBadge = diff === "Hard"
+                    ? { bg: "bg-kuromi-100 dark:bg-kuromi-900 text-kuromi-600 dark:text-kuromi-300 border-kuromi-300 dark:border-kuromi-600", dot: "bg-kuromi-500", label: "Kuromi Hard", icon: <Kuromi className="w-4 h-4 shrink-0" /> }
+                    : diff === "Medium"
+                    ? { bg: "bg-pompom-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-pompom-300 dark:border-amber-700", dot: "bg-pompom-400", label: "Purin Medium", icon: <Pompompurin className="w-4 h-4 shrink-0" /> }
+                    : { bg: "bg-kitty-100 dark:bg-kitty-950/60 text-kitty-600 dark:text-kitty-300 border-kitty-200 dark:border-kitty-700", dot: "bg-kitty-500", label: "Kitty Easy", icon: <HelloKitty className="w-4 h-4 shrink-0" /> };
+
                   const cleanTitle = qSet.title.includes("•") 
                     ? qSet.title.split("•")[1].trim() 
                     : qSet.title;
@@ -156,28 +178,29 @@ export default function Quiz({
                           onSelectMaterial(qSet.id);
                         }
                       }}
-                      className="p-4 rounded-2xl border-2 border-slate-200 hover:border-indigo-600 bg-white hover:bg-indigo-50/40 text-left transition-all duration-200 shadow-xs hover:shadow-md group flex items-center justify-between gap-3.5"
+                      className="p-4 rounded-2xl border-2 border-kitty-200 dark:border-kuromi-700 hover:border-kitty-500 dark:hover:border-kuromi-400 bg-white dark:bg-kuromi-900/90 hover:bg-kitty-50/50 dark:hover:bg-kuromi-800/90 text-left transition-all duration-200 shadow-pop-sm hover:shadow-pop group flex items-center justify-between gap-3.5 relative overflow-hidden"
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="w-10 h-10 rounded-2xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-sm shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition duration-200 shadow-inner">
+                        <div className="w-10 h-10 rounded-2xl bg-melody-100 dark:bg-kuromi-800 text-melody-600 dark:text-kuromi-300 flex items-center justify-center font-black text-sm shrink-0 group-hover:bg-melody-500 group-hover:text-white transition duration-200 shadow-inner font-fredoka">
                           {idx + 1}
                         </div>
                         <div className="min-w-0">
-                          <div className="text-xs sm:text-sm font-black text-slate-900 group-hover:text-indigo-700 truncate leading-snug">
+                          <div className="text-xs sm:text-sm font-black text-slate-800 dark:text-white group-hover:text-melody-600 dark:group-hover:text-kuromi-300 truncate leading-snug font-fredoka">
                             {cleanTitle}
                           </div>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[10px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">
-                              10 Questions
+                          <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                            <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border flex items-center gap-1.5 font-fredoka ${diffBadge.bg}`}>
+                              {diffBadge.icon}
+                              {diffBadge.label}
                             </span>
-                            <span className="text-[11px] text-slate-400 font-medium">
-                              Case Scenarios
+                            <span className="text-[10px] font-black text-melody-600 dark:text-kuromi-300 bg-melody-50 dark:bg-kuromi-950/60 border border-melody-200 dark:border-kuromi-800 px-2 py-0.5 rounded-full font-fredoka">
+                              10 Questions
                             </span>
                           </div>
                         </div>
                       </div>
 
-                      <div className="w-8 h-8 rounded-full bg-slate-100 group-hover:bg-indigo-600 text-slate-400 group-hover:text-white flex items-center justify-center shrink-0 transition">
+                      <div className="w-8 h-8 rounded-full bg-kitty-100 dark:bg-kuromi-800 group-hover:bg-kitty-500 text-kitty-600 dark:text-kuromi-300 group-hover:text-white flex items-center justify-center shrink-0 transition shadow-pop-sm">
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
                       </div>
                     </button>
@@ -189,13 +212,14 @@ export default function Quiz({
           </div>
 
           {/* Footer Bar */}
-          <div className="p-4 sm:p-5 bg-white border-t border-slate-200 flex items-center justify-between shrink-0">
-            <span className="text-xs font-semibold text-slate-400">
-              Pick any topic set to begin your 10-question case review.
+          <div className="p-4 sm:p-5 bg-white dark:bg-kuromi-900 border-t-2 border-kitty-200 dark:border-kuromi-700 flex items-center justify-between shrink-0 transition-colors">
+            <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-quicksand flex items-center gap-1.5">
+              <CuteBow className="w-3.5 h-3.5 text-kitty-500" />
+              Pick any topic set to begin your 10-question Sanrio study session!
             </span>
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 transition"
+              className="px-5 py-2 text-xs font-black text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition font-fredoka bg-slate-100 dark:bg-kuromi-800 rounded-xl hover:bg-slate-200"
             >
               Cancel
             </button>
@@ -263,21 +287,43 @@ export default function Quiz({
   const progressPercentage = Math.round(((currentIndex + 1) / total) * 100);
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl max-w-3xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[92vh] overflow-hidden my-auto">
+    <div className="fixed inset-0 z-50 bg-kitty-950/70 dark:bg-kuromi-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+      <div className="bg-white dark:bg-kuromi-900 rounded-3xl max-w-3xl w-full shadow-pop border-3 border-kitty-200 dark:border-kuromi-700 flex flex-col max-h-[92vh] overflow-hidden my-auto relative">
         
+        {/* Top Washi Tape */}
+        <div className="absolute top-2 right-12 w-24 h-3.5 washi-tape-yellow rotate-2 z-20 opacity-80 rounded-xs pointer-events-none" />
+
         {/* Sleek Top Header */}
-        <div className="p-4 sm:p-5 bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-950 text-white shrink-0">
+        <div className="p-4 sm:p-5 bg-gradient-to-r from-kitty-100 via-melody-100 to-pompom-100 dark:from-kuromi-950 dark:via-kuromi-900 dark:to-kuromi-950 border-b-2 border-kitty-200 dark:border-kuromi-700 text-slate-800 dark:text-white shrink-0 pt-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-500/20 text-blue-300 border border-blue-400/30">
-                  <Sparkles className="w-3 h-3 text-blue-400" />
-                  10-Question Case Challenge
+                {(() => {
+                  let diff = "Easy";
+                  if (quiz.title.toLowerCase().includes("[hard]")) diff = "Hard";
+                  else if (quiz.title.toLowerCase().includes("[medium]")) diff = "Medium";
+
+                  const badge = diff === "Hard"
+                    ? "bg-kuromi-100 dark:bg-kuromi-800 text-kuromi-600 dark:text-kuromi-300 border-kuromi-300 dark:border-kuromi-600"
+                    : diff === "Medium"
+                    ? "bg-pompom-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 border-pompom-300 dark:border-amber-700"
+                    : "bg-kitty-100 dark:bg-kitty-950 text-kitty-600 dark:text-kitty-300 border-kitty-300 dark:border-kitty-700";
+
+                  return (
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-black uppercase border font-fredoka shadow-pop-sm ${badge}`}>
+                      <CuteStar className="w-3.5 h-3.5" />
+                      {diff} Level
+                    </span>
+                  );
+                })()}
+
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-white/90 dark:bg-kuromi-800 text-melody-600 dark:text-kuromi-300 border border-melody-200 dark:border-kuromi-600 font-fredoka shadow-pop-sm">
+                  <Sparkles className="w-3 h-3 text-melody-500" />
+                  10 Questions
                 </span>
 
-                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
-                  Jump to Set:
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-wider ml-1 font-fredoka">
+                  Set:
                 </span>
                 
                 {/* Instant Set Switcher Dropdown */}
@@ -290,17 +336,17 @@ export default function Quiz({
                       onSelectMaterial(e.target.value);
                     }
                   }}
-                  className="bg-slate-800/90 text-blue-200 border border-slate-700 text-xs font-bold rounded-xl px-2.5 py-1 focus:ring-2 focus:ring-blue-500 focus:outline-none cursor-pointer max-w-[240px] truncate"
+                  className="bg-white dark:bg-kuromi-800 text-slate-800 dark:text-kuromi-200 border-2 border-kitty-200 dark:border-kuromi-600 text-xs font-bold rounded-xl px-2.5 py-1 focus:ring-2 focus:ring-kitty-400 focus:outline-none cursor-pointer max-w-[240px] truncate shadow-pop-sm font-fredoka"
                 >
                   {quizzes.map((q) => (
-                    <option key={q.id} value={q.id} className="bg-slate-900 text-white">
+                    <option key={q.id} value={q.id} className="bg-white dark:bg-kuromi-900 text-slate-900 dark:text-white">
                       {q.title}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <h2 className="text-sm sm:text-base font-black truncate text-white tracking-tight">
+              <h2 className="text-sm sm:text-base font-black truncate text-slate-900 dark:text-white tracking-tight font-fredoka">
                 {quiz.title}
               </h2>
             </div>
@@ -308,17 +354,17 @@ export default function Quiz({
             <div className="flex items-center gap-3 shrink-0 self-end sm:self-center">
               {/* Question Count Pill */}
               <div className="text-right">
-                <div className="text-xs font-black text-blue-400">
+                <div className="text-xs font-black text-kitty-600 dark:text-kuromi-300 font-fredoka">
                   Question {currentIndex + 1} of {total}
                 </div>
-                <div className="text-[10px] text-slate-400 font-bold">
+                <div className="text-[10px] text-slate-500 dark:text-slate-400 font-bold font-quicksand">
                   {answeredCount} answered
                 </div>
               </div>
 
               <button
                 onClick={onCancel}
-                className="w-8 h-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-300 hover:text-white transition"
+                className="w-8 h-8 rounded-full bg-white dark:bg-kuromi-800 hover:bg-kitty-100 dark:hover:bg-kuromi-700 border border-kitty-200 dark:border-kuromi-600 flex items-center justify-center text-slate-600 dark:text-slate-200 shadow-pop-sm transition font-bold"
                 title="Exit Quiz"
               >
                 <X className="w-4 h-4" />
@@ -327,33 +373,34 @@ export default function Quiz({
           </div>
 
           {/* Smooth Linear Progress Bar */}
-          <div className="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+          <div className="w-full bg-white/70 dark:bg-kuromi-950 h-2 rounded-full mt-3 overflow-hidden border border-kitty-200 dark:border-kuromi-800 p-0.5">
             <div 
-              className="bg-gradient-to-r from-blue-500 to-indigo-500 h-full transition-all duration-300 rounded-full"
+              className="bg-gradient-to-r from-kitty-400 via-melody-400 to-pompom-400 h-full transition-all duration-300 rounded-full"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
         </div>
 
         {/* Modal Content Body */}
-        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1 bg-white">
+        <div className="p-6 sm:p-8 space-y-6 overflow-y-auto flex-1 bg-kitty-50/30 dark:bg-kuromi-950/60 transition-colors">
           
           {/* Question Category & Topic Badge */}
-          <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-3 flex-wrap">
-            <span className="text-[10px] font-black uppercase px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-700 border border-indigo-200">
-              {currentQ.question_type === 'single' ? '🎯 Single Choice Case' :
-               currentQ.question_type === 'multiple' ? '☑️ Multiple Choice (Select all)' : '⚖️ Logical True / False'}
+          <div className="flex items-center justify-between gap-2 border-b-2 border-kitty-100 dark:border-kuromi-800 pb-3 flex-wrap">
+            <span className="text-[10px] font-black uppercase px-3 py-1 rounded-full bg-melody-50 dark:bg-kuromi-900 text-melody-600 dark:text-kuromi-300 border border-melody-200 dark:border-kuromi-700 font-fredoka shadow-pop-sm flex items-center gap-1.5">
+              <CuteBow className="w-3.5 h-3.5" />
+              {currentQ.question_type === 'single' ? 'Single Choice Case' :
+               currentQ.question_type === 'multiple' ? 'Multiple Choice (Select all)' : 'Logical True / False'}
             </span>
             {currentQ.concept_tag && (
-              <span className="text-xs font-extrabold text-slate-500 flex items-center gap-1.5">
-                <Target className="w-3.5 h-3.5 text-indigo-500" />
+              <span className="text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-1.5 font-fredoka">
+                <Target className="w-3.5 h-3.5 text-kitty-500" />
                 {currentQ.concept_tag}
               </span>
             )}
           </div>
 
           {/* Case Prompt */}
-          <div className="text-sm sm:text-base font-extrabold text-slate-900 leading-relaxed whitespace-pre-wrap bg-slate-50 p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-inner">
+          <div className="text-sm sm:text-base font-black text-slate-800 dark:text-slate-100 leading-relaxed whitespace-pre-wrap bg-white dark:bg-kuromi-900 p-4 sm:p-5 rounded-2xl border-2 border-kitty-200 dark:border-kuromi-700 shadow-pop font-quicksand">
             {currentQ.prompt}
           </div>
 
@@ -371,18 +418,18 @@ export default function Quiz({
                   onClick={() => isSingleOrTF ? handleSingleSelect(opt.id) : handleMultipleSelect(opt.id)}
                   className={`p-4 rounded-2xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 ${
                     isSelected 
-                      ? 'border-indigo-600 bg-indigo-50/70 text-indigo-950 font-bold shadow-xs scale-[1.005]' 
-                      : 'border-slate-200 hover:border-indigo-300 hover:bg-slate-50/80 text-slate-700'
+                      ? 'border-kitty-500 dark:border-kuromi-400 bg-kitty-100/70 dark:bg-kuromi-800/80 text-kitty-950 dark:text-white font-black shadow-pop scale-[1.01]' 
+                      : 'border-kitty-100 dark:border-kuromi-800 hover:border-kitty-300 dark:hover:border-kuromi-700 bg-white dark:bg-kuromi-900/60 hover:bg-kitty-50/50 dark:hover:bg-kuromi-800/50 text-slate-700 dark:text-slate-300'
                   }`}
                 >
-                  <div className={`w-6 h-6 rounded-xl flex items-center justify-center border-2 font-black text-xs shrink-0 mt-0.5 transition ${
+                  <div className={`w-7 h-7 rounded-xl flex items-center justify-center border-2 font-black text-xs shrink-0 mt-0.5 transition font-fredoka ${
                     isSelected 
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-xs' 
-                      : 'border-slate-300 text-slate-400 bg-white'
+                      ? 'bg-kitty-500 border-kitty-500 text-white shadow-pop-sm' 
+                      : 'border-kitty-200 dark:border-kuromi-700 text-slate-400 dark:text-slate-500 bg-white dark:bg-kuromi-800'
                   }`}>
                     {opt.id}
                   </div>
-                  <div className="text-xs sm:text-sm leading-relaxed pt-0.5">{opt.text}</div>
+                  <div className="text-xs sm:text-sm leading-relaxed pt-0.5 font-bold font-quicksand">{opt.text}</div>
                 </div>
               );
             })}
@@ -393,16 +440,16 @@ export default function Quiz({
             {!revealedHints[currentQ.id] ? (
               <button
                 onClick={toggleHint}
-                className="inline-flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100/80 border border-amber-200 px-3.5 py-2 rounded-xl transition shadow-xs"
+                className="inline-flex items-center gap-2 text-xs font-black text-amber-800 dark:text-amber-300 bg-pompom-100 dark:bg-amber-950/50 hover:bg-pompom-200 border-2 border-pompom-300 dark:border-amber-700 px-3.5 py-2 rounded-xl transition shadow-pop-sm font-fredoka"
               >
-                <Lightbulb className="w-4 h-4 text-amber-600 animate-pulse" />
-                Need a strategic hint? (Does not reveal answer)
+                <Pompompurin className="w-4 h-4 shrink-0" />
+                Need a study hint from Pompompurin? (Does not reveal answer)
               </button>
             ) : (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 text-amber-900 text-xs leading-relaxed flex items-start gap-3 shadow-xs">
-                <Lightbulb className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-pompom-100 to-amber-100 dark:from-amber-950/60 dark:to-orange-950/40 border-2 border-pompom-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs leading-relaxed flex items-start gap-3 shadow-pop font-quicksand">
+                <Pompompurin className="w-6 h-6 shrink-0 mt-0.5" />
                 <div>
-                  <div className="font-black text-amber-950 uppercase tracking-wide text-[10px] mb-0.5">Strategic Hint</div>
+                  <div className="font-black text-amber-950 dark:text-amber-300 uppercase tracking-wide text-[10px] mb-0.5 font-fredoka">Strategic Hint</div>
                   {currentQ.hint}
                 </div>
               </div>
@@ -412,11 +459,11 @@ export default function Quiz({
         </div>
 
         {/* Modal Bottom Footer Navigation */}
-        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+        <div className="p-4 sm:p-5 bg-white dark:bg-kuromi-900 border-t-2 border-kitty-200 dark:border-kuromi-700 flex items-center justify-between shrink-0 transition-colors">
           <button
             onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
             disabled={currentIndex === 0}
-            className="px-4 py-2.5 text-xs font-extrabold text-slate-600 bg-white border border-slate-200 hover:bg-slate-100 rounded-xl transition flex items-center gap-1.5 disabled:opacity-30 shadow-xs"
+            className="px-4 py-2.5 text-xs font-black text-slate-600 dark:text-slate-300 bg-white dark:bg-kuromi-800 border-2 border-kitty-200 dark:border-kuromi-700 hover:bg-kitty-100 dark:hover:bg-kuromi-700 rounded-xl transition flex items-center gap-1.5 disabled:opacity-30 shadow-pop-sm font-fredoka"
           >
             <ChevronLeft className="w-4 h-4" /> Previous
           </button>
@@ -424,7 +471,7 @@ export default function Quiz({
           {!isLast ? (
             <button
               onClick={() => setCurrentIndex(prev => Math.min(total - 1, prev + 1))}
-              className="px-6 py-2.5 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+              className="px-6 py-2.5 text-xs font-black text-white bg-kitty-500 hover:bg-kitty-600 rounded-xl transition flex items-center gap-2 shadow-pop hover:shadow-pop-sm active:scale-95 font-fredoka"
             >
               Next Question <ChevronRight className="w-4 h-4" />
             </button>
@@ -432,7 +479,7 @@ export default function Quiz({
             <button
               onClick={handleFinish}
               disabled={isSubmitting}
-              className="px-6 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95"
+              className="px-6 py-2.5 text-xs font-black text-white bg-emerald-500 hover:bg-emerald-600 rounded-xl transition flex items-center gap-2 shadow-pop hover:shadow-pop-sm active:scale-95 font-fredoka"
             >
               {isSubmitting ? 'Grading Challenge...' : 'Submit 10-Question Set'}
               <CheckCircle className="w-4 h-4" />
