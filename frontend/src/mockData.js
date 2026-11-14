@@ -3,9 +3,9 @@ export const MOCK_DATA = {
   "stats": {
     "materialsCount": 5,
     "notesGenerated": 5,
-    "quizzesCompleted": 0,
-    "averageScore": 0,
-    "revisionTopicsCount": 26
+    "quizzesCompleted": 5,
+    "averageScore": 86,
+    "revisionTopicsCount": 4
   },
   "materials": [
     {
@@ -7592,6 +7592,120 @@ export const MOCK_DATA = {
       ]
     }
   ],
-  "attemptsHistory": [],
-  "revisionQueue": []
+  "attemptsHistory": [
+    {
+      "id": "att-1",
+      "quizId": "e53c1ec4-2a20-472d-87c5-1cc13bcc5a45",
+      "quizTitle": "[Easy] Set 1: Web Fundamentals, DNS & HTTPS Encryption",
+      "source": "PM2 Combined Overview - Day 1",
+      "score": 90,
+      "correctCount": 9,
+      "totalQuestions": 10,
+      "date": "2026-11-14T11:20:00Z",
+      "timeSpent": "3m 42s",
+      "missedConcepts": [
+        "DNS Propagation & TTL Caching"
+      ],
+      "deckId": "pm2-day1"
+    },
+    {
+      "id": "att-2",
+      "quizId": "37be488d-3522-4869-a77c-913d8d68bbce",
+      "quizTitle": "[Easy] Set 1: What is an API & How Calls Work (REST Verbs)",
+      "source": "PM2 APIs & Integrations - Day 2",
+      "score": 80,
+      "correctCount": 8,
+      "totalQuestions": 10,
+      "date": "2026-11-14T12:05:00Z",
+      "timeSpent": "4m 15s",
+      "missedConcepts": [
+        "Idempotent HTTP PUT vs PATCH",
+        "Webhook Retry Exponential Backoff"
+      ],
+      "deckId": "pm2-day2"
+    },
+    {
+      "id": "att-3",
+      "quizId": "9160e66b-901b-437f-b5b4-191744c32381",
+      "quizTitle": "[Easy] Set 1: What is a Database, SQL vs NoSQL Selection",
+      "source": "PM2 Databases & Data Modeling - Day 3",
+      "score": 100,
+      "correctCount": 10,
+      "totalQuestions": 10,
+      "date": "2026-11-14T13:40:00Z",
+      "timeSpent": "3m 10s",
+      "missedConcepts": [],
+      "deckId": "pm2-day3"
+    },
+    {
+      "id": "att-4",
+      "quizId": "8b73a478-b697-4f30-ad40-4605769fa529",
+      "quizTitle": "[Medium] Set 3: Cloud Infrastructure (AWS vs Azure vs GCP) & IaC",
+      "source": "PM2 Tech Stacks Guide",
+      "score": 70,
+      "correctCount": 7,
+      "totalQuestions": 10,
+      "date": "2026-11-14T14:15:00Z",
+      "timeSpent": "5m 50s",
+      "missedConcepts": [
+        "Multi-AZ Database Replication Lag",
+        "Terraform State Locking",
+        "Egress Bandwidth Cost Drivers"
+      ],
+      "deckId": "pm2-tech-guide"
+    },
+    {
+      "id": "att-5",
+      "quizId": "cf0b9c57-f5fb-4c5a-87f8-b9cc9ad7f0d5",
+      "quizTitle": "[Medium] Set 3: Web Frameworks: FastAPI vs Django vs Flask",
+      "source": "Tech Stacks: Python in Production",
+      "score": 90,
+      "correctCount": 9,
+      "totalQuestions": 10,
+      "date": "2026-11-14T15:00:00Z",
+      "timeSpent": "4m 02s",
+      "missedConcepts": [
+        "ASGI Concurrency vs Celery Distributed Task Queues"
+      ],
+      "deckId": "pm2-python"
+    }
+  ],
+  "revisionQueue": [
+    {
+      "id": "rev-1",
+      "concept": "Idempotency in Payment APIs (POST vs PUT)",
+      "sourceMaterial": "PM2 APIs & Integrations - Day 2",
+      "missCount": 2,
+      "status": "Scheduled for Spaced Drill",
+      "priority": "High",
+      "character": "kuromi"
+    },
+    {
+      "id": "rev-2",
+      "concept": "Multi-AZ Database Replication Lag & Read Replicas",
+      "sourceMaterial": "PM2 Tech Stacks Guide",
+      "missCount": 2,
+      "status": "Needs Flashcard Review",
+      "priority": "High",
+      "character": "melody"
+    },
+    {
+      "id": "rev-3",
+      "concept": "DNS TTL Caching & IP Resolution Latency",
+      "sourceMaterial": "PM2 Combined Overview - Day 1",
+      "missCount": 1,
+      "status": "Quick Drill Ready",
+      "priority": "Medium",
+      "character": "kitty"
+    },
+    {
+      "id": "rev-4",
+      "concept": "ASGI vs Celery Asynchronous Workers in Python",
+      "sourceMaterial": "Tech Stacks: Python in Production",
+      "missCount": 1,
+      "status": "Concept Clear",
+      "priority": "Low",
+      "character": "pompom"
+    }
+  ]
 };

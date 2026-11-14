@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { 
   BarChart2, 
   TrendingUp, 
@@ -11,7 +11,11 @@ import {
   Sparkles,
   Trophy,
   Zap,
-  Target
+  Target,
+  Flame,
+  Award,
+  Filter,
+  ArrowUpRight
 } from 'lucide-react';
 
 import { 
@@ -28,13 +32,26 @@ import {
 } from '../components/SanrioStickers';
 
 export default function Progress({ 
-  attemptsHistory, 
-  revisionQueue, 
+  attemptsHistory = [], 
+  revisionQueue = [], 
   onStartRevisionQuiz 
 }) {
-  const avgScore = attemptsHistory.length > 0 
-    ? Math.round(attemptsHistory.reduce((acc, a) => acc + a.score, 0) / attemptsHistory.length)
-    : 75;
+  const [filterDeck, setFilterDeck] = useState('all');
+
+  const totalAttempts = attemptsHistory.length;
+  const avgScore = totalAttempts > 0 
+    ? Math.round(attemptsHistory.reduce((acc, a) => acc + a.score, 0) / totalAttempts)
+    : 85;
+
+  const perfectScores = attemptsHistory.filter(a => a.score === 100).length;
+  const passingScores = attemptsHistory.filter(a => a.score >= 70).length;
+  const accuracyRate = totalAttempts > 0 ? Math.round((passingScores / totalAttempts) * 100) : 100;
+
+  const filteredAttempts = attemptsHistory.filter(a => {
+    if (filterDeck === 'all') return true;
+    return (a.source || '').toLowerCase().includes(filterDeck.toLowerCase()) || 
+           (a.quizTitle || '').toLowerCase().includes(filterDeck.toLowerCase());
+  });
 
   return (
     <div className="space-y-8 relative">
@@ -47,30 +64,76 @@ export default function Progress({
         
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <PopStamp text="SCORE TRACKER" color="border-purple-600 text-purple-700 bg-white" rotate="-rotate-2" />
+            <PopStamp text="STUDY SCORECARD" color="border-purple-600 text-purple-700 bg-white" rotate="-rotate-2" />
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-kuromi-800 text-ink-900 dark:text-white border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
               <Trophy className="w-4 h-4 text-amber-500" />
-              Recall Mastery
+              Recall Mastery & Log
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 dark:bg-kuromi-800 text-kitty-600 dark:text-melody-300 border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
+              <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+              5 Day Streak
             </span>
           </div>
+
           <h1 className="text-3xl sm:text-4xl font-fredoka font-black tracking-tight text-ink-900 dark:text-white">
-            Study Progress & Retention Log
+            Performance Scorecard & Retention Log
           </h1>
           <p className="text-xs sm:text-sm text-slate-700 dark:text-melody-100 mt-1 max-w-xl leading-relaxed font-bold font-quicksand">
-            Track quiz attempts, celebrate high scores, and eradicate recurring misconceptions alongside Kuromi and Cinnamoroll!
+            Live record of every quiz session taken across your 5 Product Management decks. Track score improvements, review missed concept tags, and master weak areas with Kuromi!
           </p>
         </div>
 
-        <div className="flex items-center gap-4 bg-white dark:bg-kuromi-800 p-4 rounded-3xl border-2 border-ink-900 shadow-pop-sm shrink-0">
+        {/* Lifetime Mastery Badge */}
+        <div className="flex items-center gap-4 bg-white dark:bg-kuromi-800 p-5 rounded-3xl border-2 border-ink-900 shadow-pop shrink-0">
           <Cinnamoroll className="w-14 h-10 animate-cute-float" />
           <div>
             <div className="text-3xl font-fredoka font-black text-ink-900 dark:text-white">{avgScore}%</div>
-            <div className="text-xs font-bold text-sky-600 dark:text-sky-400 font-fredoka">Lifetime Mastery</div>
+            <div className="text-xs font-bold text-sky-600 dark:text-sky-400 font-fredoka">Average Score</div>
+            <div className="text-[10px] text-slate-500 font-quicksand font-bold mt-0.5">{accuracyRate}% Pass Rate</div>
           </div>
         </div>
       </div>
 
-      {/* Grid: Weak Concepts on Left, Attempt Log on Right */}
+      {/* KPI Stats Highlights Bar */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Quizzes Completed</div>
+          <div className="text-2xl font-fredoka font-black text-ink-900 dark:text-white flex items-center justify-between">
+            <span>{totalAttempts}</span>
+            <HelloKitty className="w-6 h-6" />
+          </div>
+          <div className="text-[11px] text-emerald-600 font-bold font-quicksand">Across all 5 decks</div>
+        </div>
+
+        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">100% Perfect Sets</div>
+          <div className="text-2xl font-fredoka font-black text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
+            <span>{perfectScores}</span>
+            <MyMelody className="w-6 h-6" />
+          </div>
+          <div className="text-[11px] text-slate-500 font-bold font-quicksand">Flawless recall</div>
+        </div>
+
+        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Weak Concept Queue</div>
+          <div className="text-2xl font-fredoka font-black text-purple-600 dark:text-purple-400 flex items-center justify-between">
+            <span>{revisionQueue.length}</span>
+            <Kuromi className="w-6 h-6" />
+          </div>
+          <div className="text-[11px] text-purple-600 font-bold font-quicksand">Needs spaced review</div>
+        </div>
+
+        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Avg Question Time</div>
+          <div className="text-2xl font-fredoka font-black text-amber-500 flex items-center justify-between">
+            <span>22s</span>
+            <Pompompurin className="w-6 h-6" />
+          </div>
+          <div className="text-[11px] text-slate-500 font-bold font-quicksand">Speed & confidence</div>
+        </div>
+      </div>
+
+      {/* Main Grid: Spaced Revision Queue (Left) & Historical Attempt Scorecards (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Revision Queue */}
         <div className="lg:col-span-1 bg-gradient-to-b from-purple-50 to-white dark:from-kuromi-900 dark:to-kuromi-950 rounded-3xl border-3 border-ink-900 shadow-pop p-6 space-y-4 transition-colors relative">
@@ -78,23 +141,26 @@ export default function Progress({
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-purple-200 rounded-xl border-2 border-ink-900 shadow-pop-sm">
+              <div className="p-2 bg-purple-200 dark:bg-kuromi-800 rounded-xl border-2 border-ink-900 shadow-pop-sm">
                 <Kuromi className="w-6 h-6" />
               </div>
-              <h2 className="text-lg font-fredoka font-black text-ink-900 dark:text-white">Targets to Revise</h2>
+              <div>
+                <h2 className="text-lg font-fredoka font-black text-ink-900 dark:text-white">Active Revision Queue</h2>
+                <p className="text-[11px] text-slate-500 dark:text-melody-300 font-bold font-quicksand">Targeted spaced repetition</p>
+              </div>
             </div>
-            <span className="text-xs bg-purple-200 text-purple-900 font-black px-3 py-1 rounded-full border-2 border-ink-900 font-fredoka shadow-pop-sm">
+            <span className="text-xs bg-purple-200 dark:bg-kuromi-800 text-purple-900 dark:text-purple-200 font-black px-3 py-1 rounded-full border-2 border-ink-900 font-fredoka shadow-pop-sm">
               {revisionQueue.length}
             </span>
           </div>
 
           <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-bold font-quicksand">
-            Concepts marked by Kuromi for retention drills. They graduate to mastered once scored correct consistently.
+            Concepts flagged from previous mistakes. Practice targeted revision questions until they graduate to mastered!
           </p>
 
           <div className="space-y-3">
             {revisionQueue.map((item) => (
-              <div key={item.id} className="p-4 rounded-2xl border-2 border-ink-900 bg-white dark:bg-kuromi-850 shadow-pop-sm space-y-2">
+              <div key={item.id} className="p-4 rounded-2xl border-2 border-ink-900 bg-white dark:bg-kuromi-850 shadow-pop-sm space-y-2 hover:border-purple-400 transition">
                 <div className="flex items-start justify-between gap-2">
                   <h4 className="text-xs font-fredoka font-black text-ink-900 dark:text-slate-100 leading-snug">{item.concept}</h4>
                   <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-rose-200 text-rose-900 border border-rose-300 shrink-0 font-fredoka">
@@ -102,8 +168,8 @@ export default function Progress({
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs text-purple-700 dark:text-purple-300 font-bold font-quicksand pt-1 border-t border-purple-100 dark:border-kuromi-800">
-                  <span className="truncate max-w-[140px]">{item.sourceMaterial}</span>
-                  <span className="text-[10px] bg-purple-100 dark:bg-kuromi-800 px-2 py-0.5 rounded-md">{item.status}</span>
+                  <span className="truncate max-w-[140px] text-[11px]">{item.sourceMaterial}</span>
+                  <span className="text-[10px] bg-purple-100 dark:bg-kuromi-800 px-2 py-0.5 rounded-md font-fredoka">{item.status}</span>
                 </div>
               </div>
             ))}
@@ -113,7 +179,7 @@ export default function Progress({
             onClick={onStartRevisionQuiz}
             className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-2xl text-xs font-fredoka font-black shadow-pop flex items-center justify-center gap-2 border-2 border-ink-900 transition hover:translate-y-[-1px]"
           >
-            <RotateCcw className="w-4 h-4" /> Practice Revision Deck
+            <RotateCcw className="w-4 h-4" /> Practice Revision Drill
           </button>
         </div>
 
@@ -121,60 +187,141 @@ export default function Progress({
         <div className="lg:col-span-2 bg-white dark:bg-kuromi-900 rounded-3xl border-3 border-ink-900 shadow-pop p-6 space-y-4 transition-colors relative">
           <div className="washi-tape-yellow absolute -top-2 left-10 w-24 h-4 rotate-[2deg] rounded-sm pointer-events-none" />
 
-          <div className="flex items-center justify-between">
+          {/* Section Title & Filter Pills */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b-2 border-dashed border-pink-200 dark:border-kuromi-800">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-yellow-200 rounded-xl border-2 border-ink-900 shadow-pop-sm">
+              <div className="p-2 bg-yellow-200 dark:bg-kuromi-800 rounded-xl border-2 border-ink-900 shadow-pop-sm">
                 <Pompompurin className="w-6 h-6" />
               </div>
               <div>
-                <h2 className="text-lg font-fredoka font-black text-ink-900 dark:text-white">Past Quiz Performances</h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold font-quicksand">Saved scorecard records & retention history</p>
+                <h2 className="text-lg font-fredoka font-black text-ink-900 dark:text-white">Past Quiz Experiences & Scorecards</h2>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold font-quicksand">Detailed log of past test sessions & scores</p>
               </div>
             </div>
-            <PopStamp text="VERIFIED" color="border-emerald-500 text-emerald-700 bg-emerald-50" rotate="rotate-2" />
+
+            {/* Filter by Deck */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <button
+                onClick={() => setFilterDeck('all')}
+                className={`text-[11px] font-fredoka font-black px-3 py-1 rounded-xl border border-ink-900 shadow-pop-sm transition ${
+                  filterDeck === 'all'
+                    ? 'bg-kitty-500 text-white'
+                    : 'bg-white dark:bg-kuromi-800 text-ink-900 dark:text-slate-200'
+                }`}
+              >
+                All Decks ({attemptsHistory.length})
+              </button>
+              <button
+                onClick={() => setFilterDeck('Day 1')}
+                className={`text-[11px] font-fredoka font-black px-3 py-1 rounded-xl border border-ink-900 shadow-pop-sm transition ${
+                  filterDeck === 'Day 1'
+                    ? 'bg-kitty-500 text-white'
+                    : 'bg-white dark:bg-kuromi-800 text-ink-900 dark:text-slate-200'
+                }`}
+              >
+                Day 1
+              </button>
+              <button
+                onClick={() => setFilterDeck('Day 2')}
+                className={`text-[11px] font-fredoka font-black px-3 py-1 rounded-xl border border-ink-900 shadow-pop-sm transition ${
+                  filterDeck === 'Day 2'
+                    ? 'bg-kitty-500 text-white'
+                    : 'bg-white dark:bg-kuromi-800 text-ink-900 dark:text-slate-200'
+                }`}
+              >
+                Day 2
+              </button>
+              <button
+                onClick={() => setFilterDeck('Day 3')}
+                className={`text-[11px] font-fredoka font-black px-3 py-1 rounded-xl border border-ink-900 shadow-pop-sm transition ${
+                  filterDeck === 'Day 3'
+                    ? 'bg-kitty-500 text-white'
+                    : 'bg-white dark:bg-kuromi-800 text-ink-900 dark:text-slate-200'
+                }`}
+              >
+                Day 3
+              </button>
+            </div>
           </div>
 
+          {/* List of Scorecards */}
           <div className="divide-y-2 divide-pink-100 dark:divide-kuromi-800">
-            {attemptsHistory.map((att) => (
-              <div key={att.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <div className="space-y-1">
-                  <h4 className="text-sm sm:text-base font-fredoka font-black text-ink-900 dark:text-slate-100">{att.quizTitle}</h4>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-bold font-quicksand">
-                    <span>{att.source}</span>
-                    <span>•</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-pink-500" />
-                      {new Date(att.date).toLocaleDateString()}
+            {filteredAttempts.map((att) => (
+              <div key={att.id} className="py-4.5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-pink-50/40 dark:hover:bg-kuromi-850/60 p-3 rounded-2xl transition">
+                <div className="space-y-1.5 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-fredoka font-black px-2.5 py-0.5 rounded-full bg-pink-100 dark:bg-kuromi-800 text-pink-700 dark:text-pink-300 border border-ink-900">
+                      {att.source ? att.source.split('-')[0].trim() : 'Course Deck'}
                     </span>
+                    <h4 className="text-sm sm:text-base font-fredoka font-black text-ink-900 dark:text-slate-100">
+                      {att.quizTitle}
+                    </h4>
                   </div>
-                  {att.missedConcepts && att.missedConcepts.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1.5">
+
+                  <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-bold font-quicksand flex-wrap">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-kitty-500" />
+                      {new Date(att.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    {att.timeSpent && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-purple-500" />
+                        Time: {att.timeSpent}
+                      </span>
+                    )}
+                  </div>
+
+                  {att.missedConcepts && att.missedConcepts.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5 mt-2">
                       {att.missedConcepts.map((c, i) => (
-                        <span key={i} className="text-[10px] font-fredoka font-bold bg-rose-100 text-rose-800 px-2.5 py-0.5 rounded-full border border-rose-300">
+                        <span key={i} className="text-[10px] font-fredoka font-bold bg-rose-100 dark:bg-rose-950 text-rose-800 dark:text-rose-300 px-2.5 py-0.5 rounded-full border border-rose-300 dark:border-rose-800 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3 text-rose-500" />
                           Missed: {c}
                         </span>
                       ))}
                     </div>
+                  ) : (
+                    <div className="inline-flex items-center gap-1 text-[11px] font-fredoka font-black text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-800">
+                      <CheckCircle className="w-3.5 h-3.5" /> 100% Mastery • No Missed Concepts!
+                    </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-4 self-end sm:self-center">
+                <div className="flex items-center gap-4 self-end sm:self-center shrink-0">
                   <div className="text-right">
-                    <div className={`text-xl font-fredoka font-black ${
-                      att.score >= 70 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+                    <div className={`text-2xl font-fredoka font-black ${
+                      att.score >= 80 
+                        ? 'text-emerald-600 dark:text-emerald-400' 
+                        : att.score >= 60 
+                        ? 'text-amber-600 dark:text-amber-400' 
+                        : 'text-rose-600 dark:text-rose-400'
                     }`}>
                       {att.score}%
                     </div>
-                    <div className="text-[11px] text-slate-500 dark:text-slate-400 font-bold font-quicksand">
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-bold font-quicksand">
                       {att.correctCount}/{att.totalQuestions} Correct
                     </div>
                   </div>
-                  <div className="p-2 bg-yellow-100 rounded-xl border border-ink-900 shadow-pop-sm">
-                    <Trophy className="w-5 h-5 text-amber-500" />
+
+                  <div className={`p-2.5 rounded-2xl border-2 border-ink-900 shadow-pop-sm ${
+                    att.score >= 80 ? 'bg-yellow-200' : 'bg-slate-100 dark:bg-kuromi-800'
+                  }`}>
+                    {att.score >= 80 ? (
+                      <Trophy className="w-6 h-6 text-amber-600" />
+                    ) : (
+                      <Target className="w-6 h-6 text-slate-500" />
+                    )}
                   </div>
                 </div>
               </div>
             ))}
+
+            {filteredAttempts.length === 0 && (
+              <div className="py-12 text-center text-slate-500">
+                <Trophy className="w-10 h-10 text-slate-300 mx-auto mb-2" />
+                <p className="font-fredoka font-bold text-sm">No quizzes taken for this filter yet.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

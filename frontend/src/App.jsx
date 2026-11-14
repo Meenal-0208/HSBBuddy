@@ -33,17 +33,17 @@ export default function App() {
   const [activeQuiz, setActiveQuiz] = useState(() => MOCK_DATA.sampleQuiz || null);
   const [allQuizzes, setAllQuizzes] = useState(() => MOCK_DATA.quizzes || []);
   const [latestResult, setLatestResult] = useState(null);
-  const [progressData, setProgressData] = useState({
-    recent_attempts: [],
-    revision_items: [],
+  const [progressData, setProgressData] = useState(() => ({
+    recent_attempts: MOCK_DATA.attemptsHistory || [],
+    revision_items: MOCK_DATA.revisionQueue || [],
     stats: MOCK_DATA.stats || {
       materialsCount: 5,
       notesGenerated: 5,
-      quizzesCompleted: 0,
-      averageScore: 0,
-      revisionTopicsCount: 26
+      quizzesCompleted: 5,
+      averageScore: 86,
+      revisionTopicsCount: 4
     }
-  });
+  }));
 
   const [loading, setLoading] = useState(false);
   const [errorToast, setErrorToast] = useState(null);
@@ -354,14 +354,40 @@ export default function App() {
         };
       });
 
+      const finalScore = Math.round((correctCount / quiz.questions.length) * 100);
+      const missed = details.filter(d => !d.isCorrect).map(d => d.conceptTag);
+
+      const newAttempt = {
+        id: `att-${Date.now()}`,
+        quizId,
+        quizTitle: quiz.title,
+        source: quiz.sourceMaterial || "Product Management Course Deck",
+        score: finalScore,
+        correctCount,
+        totalQuestions: quiz.questions.length,
+        date: new Date().toISOString(),
+        timeSpent: "3m 15s",
+        missedConcepts: missed
+      };
+
+      setProgressData(prev => ({
+        ...prev,
+        recent_attempts: [newAttempt, ...(prev.recent_attempts || [])],
+        stats: {
+          ...prev.stats,
+          quizzesCompleted: (prev.stats?.quizzesCompleted || 0) + 1,
+          averageScore: Math.round(((prev.stats?.averageScore || 80) * (prev.recent_attempts?.length || 1) + finalScore) / ((prev.recent_attempts?.length || 1) + 1))
+        }
+      }));
+
       setLatestResult({
         quizId,
         quizTitle: quiz.title,
-        score: Math.round((correctCount / quiz.questions.length) * 100),
+        score: finalScore,
         correctCount,
         totalQuestions: quiz.questions.length,
         details,
-        missedConcepts: details.filter(d => !d.isCorrect).map(d => d.conceptTag)
+        missedConcepts: missed
       });
       setActivePage('results');
     } finally {
