@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { 
-  UploadCloud, 
   FileText, 
   Trash2, 
-  RefreshCw, 
   BookOpen, 
   HelpCircle, 
   AlertCircle, 
   CheckCircle2, 
   Clock, 
-  ExternalLink,
-  Heart
+  Heart,
+  FolderOpen
 } from 'lucide-react';
 
 import { HelloKitty, MyMelody, Kuromi, Cinnamoroll, Pompompurin, CuteStar, CuteBow } from '../components/SanrioStickers';
@@ -18,47 +16,11 @@ import { HelloKitty, MyMelody, Kuromi, Cinnamoroll, Pompompurin, CuteStar, CuteB
 export default function Materials({ 
   materials, 
   onSelectMaterial, 
-  onUploadMock, 
   onDeleteMaterial,
   onGenerateNotes,
   onStartQuiz
 }) {
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [customTitle, setCustomTitle] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
   const [filterType, setFilterType] = useState('all');
-
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
-      // Default title from filename minus extension
-      const cleanName = file.name.replace(/\.[^/.]+$/, "");
-      setCustomTitle(cleanName);
-    }
-  };
-
-  const handleUploadSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedFile) return;
-
-    setIsUploading(true);
-    try {
-      if (onUploadMock) {
-        await onUploadMock({
-          file: selectedFile,
-          title: customTitle || selectedFile.name,
-          filename: selectedFile.name,
-          fileType: selectedFile.name.split('.').pop().toLowerCase(),
-          size: `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`,
-        });
-      }
-      setSelectedFile(null);
-      setCustomTitle('');
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const filteredMaterials = materials.filter(m => {
     if (filterType === 'all') return true;
@@ -85,78 +47,6 @@ export default function Materials({
             All 5 syllabus lecture PPT decks ready with 250 AI-generated case questions and revision summaries!
           </p>
         </div>
-      </div>
-
-      {/* Upload Box Component */}
-      <div className="bg-white dark:bg-kuromi-900 rounded-3xl border-3 border-dashed border-cinnamo-300 dark:border-kuromi-600 p-6 shadow-pop hover:border-cinnamo-400 transition-colors relative">
-        <div className="absolute -top-3 left-8 w-20 h-3.5 washi-tape-pink -rotate-1 opacity-90 rounded-xs" />
-        <form onSubmit={handleUploadSubmit} className="space-y-4">
-          <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-cinnamo-200 dark:border-kuromi-700 rounded-2xl bg-cinnamo-50/40 dark:bg-kuromi-950/40">
-            <Pompompurin className="w-14 h-14 mb-2 animate-bounce-gentle" />
-            <div className="text-center">
-              <label className="cursor-pointer">
-                <span className="text-sm font-black text-kitty-600 dark:text-kuromi-300 hover:text-kitty-700 font-fredoka bg-white dark:bg-kuromi-800 px-4 py-2 rounded-xl border-2 border-kitty-200 dark:border-kuromi-600 shadow-pop-sm inline-block">
-                  Upload PPTX, PDF, or DOCX 🌸
-                </span>
-                <input 
-                  type="file" 
-                  accept=".pptx,.pdf,.docx" 
-                  className="hidden" 
-                  onChange={handleFileChange}
-                />
-              </label>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-2 font-quicksand font-bold">Single-file upload up to 25MB • Private encrypted local storage</p>
-            </div>
-          </div>
-
-          {selectedFile && (
-            <div className="bg-kitty-50 dark:bg-kuromi-850 p-4 rounded-2xl border-2 border-kitty-200 dark:border-kuromi-700 space-y-3 font-quicksand">
-              <div className="flex items-center justify-between">
-                <div className="text-xs font-black text-kitty-900 dark:text-kuromi-200 flex items-center gap-2 font-fredoka">
-                  <FileText className="w-4 h-4 text-kitty-500" />
-                  {selectedFile.name} ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)
-                </div>
-                <button 
-                  type="button" 
-                  onClick={() => setSelectedFile(null)}
-                  className="text-xs text-rose-500 font-bold hover:underline"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  Custom Display Title (optional):
-                </label>
-                <input
-                  type="text"
-                  value={customTitle}
-                  onChange={(e) => setCustomTitle(e.target.value)}
-                  placeholder="e.g. Lecture Deck 6: Metrics & Monetization"
-                  className="w-full text-xs px-3 py-2 bg-white dark:bg-kuromi-800 text-slate-900 dark:text-white rounded-xl border-2 border-kitty-200 dark:border-kuromi-700 focus:outline-none focus:ring-2 focus:ring-kitty-400"
-                />
-              </div>
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isUploading}
-                  className="px-5 py-2.5 bg-kitty-500 hover:bg-kitty-600 text-white rounded-xl text-xs font-black shadow-pop flex items-center gap-2 disabled:opacity-50 font-fredoka"
-                >
-                  {isUploading ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      Uploading & Processing...
-                    </>
-                  ) : (
-                    'Confirm & Process File ✨'
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
-        </form>
       </div>
 
       {/* Materials List Table */}
