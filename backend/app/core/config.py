@@ -4,7 +4,7 @@ import os
 
 class Settings(BaseSettings):
     APP_ENV: str = "development"
-    SUBJECT_NAME: str = "Product Management 2: Tech Stacks, APIs & Databases"
+    SUBJECT_NAME: str = "PRODUCT MANAGEMENT"
     DATABASE_URL: str = "sqlite:///./study_buddy.db"
     UPLOAD_DIR: str = "../storage/uploads"
     MAX_UPLOAD_MB: int = 25

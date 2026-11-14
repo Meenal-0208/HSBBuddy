@@ -1,5 +1,5 @@
 export const MOCK_DATA = {
-  subjectName: "Product Management 2: Tech Stacks, APIs & Databases",
+  subjectName: "PRODUCT MANAGEMENT",
   stats: {
     materialsCount: 5,
     notesGenerated: 0,

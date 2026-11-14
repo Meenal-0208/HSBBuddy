@@ -25,7 +25,7 @@ import { MOCK_DATA } from './mockData';
 
 export default function App() {
   const [activePage, setActivePage] = useState('dashboard');
-  const [subjectName, setSubjectName] = useState("HSB 101: Human Structural Biology");
+  const [subjectName, setSubjectName] = useState("PRODUCT MANAGEMENT");
   const [aiConfigured, setAiConfigured] = useState(false);
   const [materials, setMaterials] = useState([]);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
