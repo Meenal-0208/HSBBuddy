@@ -120,7 +120,7 @@ export default function ShortNotes({
           topicIndex: idx + 1,
           totalInDeck: noteObj.sections.length,
           title: cleanTitle || sec.heading,
-          content: sec.content,
+          content: sec.content || sec.summary || (Array.isArray(sec.key_points) ? sec.key_points.join('\n• ') : '') || '',
           sourceRef: sec.sourceRef || `Slide ${idx + 1}`,
           overview: noteObj.overview
         });
