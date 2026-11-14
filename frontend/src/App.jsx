@@ -412,9 +412,11 @@ export default function App() {
         {activePage === 'material-detail' && (
           <MaterialDetail 
             material={selectedMaterial}
+            notes={notesData[selectedMaterial?.id] || Object.values(notesData).find(n => n?.materialTitle === selectedMaterial?.title)}
             onBack={() => setActivePage('materials')}
             onGenerateNotes={handleGenerateNotes}
             onStartQuiz={handleStartQuiz}
+            onViewNotes={() => setActivePage('notes')}
           />
         )}
 
