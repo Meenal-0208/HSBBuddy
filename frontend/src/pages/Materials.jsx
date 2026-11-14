@@ -12,14 +12,17 @@ import {
 } from 'lucide-react';
 
 import { HelloKitty, MyMelody, Kuromi, Cinnamoroll, Pompompurin, CuteStar, CuteBow } from '../components/SanrioStickers';
+import { Paimon, Primogem, MoraCoin, TeyvatStar } from '../components/GenshinStickers';
 
 export default function Materials({ 
   materials, 
   onSelectMaterial, 
   onDeleteMaterial,
   onGenerateNotes,
-  onStartQuiz
+  onStartQuiz,
+  edition = 'genshin'
 }) {
+  const isGenshin = edition === 'genshin';
   const [filterType, setFilterType] = useState('all');
 
   const filteredMaterials = materials.filter(m => {
@@ -36,15 +39,21 @@ export default function Materials({
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-cinnamo-100 dark:bg-kuromi-800 text-cinnamo-600 dark:text-kuromi-300 shadow-pop-sm border border-cinnamo-200 dark:border-kuromi-600 font-fredoka mb-2">
-            <CuteBow className="w-4 h-4" />
-            Study Materials Library
+            {isGenshin ? <Primogem className="w-4 h-4" /> : <CuteBow className="w-4 h-4" />}
+            {isGenshin ? 'Archon Decks Library' : 'Study Materials Library'}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight font-fredoka flex items-center gap-2">
-            <span>Course PPT Decks & Files</span>
-            <Cinnamoroll className="w-8 h-8 animate-bounce-gentle" />
+            <span>{isGenshin ? 'Product Management Archon Decks' : 'Course PPT Decks & Files'}</span>
+            {isGenshin ? (
+              <Paimon className="w-9 h-9 animate-cute-float" />
+            ) : (
+              <Cinnamoroll className="w-8 h-8 animate-bounce-gentle" />
+            )}
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-quicksand font-bold">
-            All 5 syllabus lecture PPT decks ready with 250 AI-generated case questions and revision summaries!
+            {isGenshin 
+              ? 'All 5 syllabus lecture PPT decks ready with 250 Paimon quest questions and visual revision scrolls!' 
+              : 'All 5 syllabus lecture PPT decks ready with 250 AI-generated case questions and revision summaries!'}
           </p>
         </div>
       </div>

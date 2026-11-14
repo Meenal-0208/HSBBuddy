@@ -76,6 +76,12 @@ export default function App() {
     } catch (e) {
       console.warn("Could not save edition preference:", e);
     }
+
+    if (edition === 'genshin') {
+      document.title = "Paimon Study Buddy ✨ • Genshin Impact Edition";
+    } else {
+      document.title = "Sanrio Study Buddy 🌸 • Cute Revision Lab";
+    }
   }, [edition]);
 
   const toggleEdition = () => {
@@ -470,6 +476,7 @@ export default function App() {
             onDeleteMaterial={handleDelete}
             onGenerateNotes={handleGenerateNotes}
             onStartQuiz={handleStartQuiz}
+            edition={edition}
           />
         )}
 

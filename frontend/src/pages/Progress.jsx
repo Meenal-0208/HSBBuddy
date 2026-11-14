@@ -128,38 +128,42 @@ export default function Progress({
 
       {/* KPI Stats Highlights Bar */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
-          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Quizzes Completed</div>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-amber-300 uppercase">
+            {isGenshin ? 'Quests Cleared' : 'Quizzes Completed'}
+          </div>
           <div className="text-2xl font-fredoka font-black text-ink-900 dark:text-white flex items-center justify-between">
             <span>{totalAttempts}</span>
-            <HelloKitty className="w-6 h-6" />
+            {isGenshin ? <Paimon className="w-6 h-6" /> : <HelloKitty className="w-6 h-6" />}
           </div>
           <div className="text-[11px] text-emerald-600 font-bold font-quicksand">Across all 5 decks</div>
         </div>
 
-        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
-          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">100% Perfect Sets</div>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-amber-300 uppercase">100% Perfect Sets</div>
           <div className="text-2xl font-fredoka font-black text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
             <span>{perfectScores}</span>
-            <MyMelody className="w-6 h-6" />
+            {isGenshin ? <Primogem className="w-6 h-6" /> : <MyMelody className="w-6 h-6" />}
           </div>
           <div className="text-[11px] text-slate-500 font-bold font-quicksand">Flawless recall</div>
         </div>
 
-        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
-          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Weak Concept Queue</div>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-amber-300 uppercase">
+            {isGenshin ? 'Abyss Drill Queue' : 'Weak Concept Queue'}
+          </div>
           <div className="text-2xl font-fredoka font-black text-purple-600 dark:text-purple-400 flex items-center justify-between">
             <span>{revisionQueue.length}</span>
-            <Kuromi className="w-6 h-6" />
+            {isGenshin ? <MoraCoin className="w-6 h-6" /> : <Kuromi className="w-6 h-6" />}
           </div>
           <div className="text-[11px] text-purple-600 font-bold font-quicksand">Needs spaced review</div>
         </div>
 
-        <div className="bg-white dark:bg-kuromi-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
-          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-melody-300 uppercase">Avg Question Time</div>
+        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-3 border-ink-900 shadow-pop-sm space-y-1">
+          <div className="text-xs font-fredoka font-black text-slate-500 dark:text-amber-300 uppercase">Avg Question Time</div>
           <div className="text-2xl font-fredoka font-black text-amber-500 flex items-center justify-between">
             <span>22s</span>
-            <Pompompurin className="w-6 h-6" />
+            {isGenshin ? <TeyvatStar className="w-6 h-6 text-amber-400" /> : <Pompompurin className="w-6 h-6" />}
           </div>
           <div className="text-[11px] text-slate-500 font-bold font-quicksand">Speed & confidence</div>
         </div>

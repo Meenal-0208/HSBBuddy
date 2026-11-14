@@ -265,11 +265,17 @@ export default function ShortNotes({
                     : 'bg-white dark:bg-kuromi-800 text-slate-700 dark:text-slate-200 hover:bg-pink-50'
                 }`}
               >
-                {pal.character === 'kitty' && <HelloKitty className="w-4 h-4" />}
-                {pal.character === 'melody' && <MyMelody className="w-4 h-4" />}
-                {pal.character === 'kuromi' && <Kuromi className="w-4 h-4" />}
-                {pal.character === 'cinnamo' && <Cinnamoroll className="w-4 h-3.5" />}
-                {pal.character === 'pompom' && <Pompompurin className="w-4 h-4" />}
+                {isGenshin ? (
+                  <Primogem className="w-4 h-4" />
+                ) : (
+                  <>
+                    {pal.character === 'kitty' && <HelloKitty className="w-4 h-4" />}
+                    {pal.character === 'melody' && <MyMelody className="w-4 h-4" />}
+                    {pal.character === 'kuromi' && <Kuromi className="w-4 h-4" />}
+                    {pal.character === 'cinnamo' && <Cinnamoroll className="w-4 h-3.5" />}
+                    {pal.character === 'pompom' && <Pompompurin className="w-4 h-4" />}
+                  </>
+                )}
                 <span>{mat.title}</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10">
                   {count}
@@ -324,11 +330,17 @@ export default function ShortNotes({
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {pal.character === 'kitty' && <HelloKitty className="w-6 h-6" />}
-                  {pal.character === 'melody' && <MyMelody className="w-6 h-6" />}
-                  {pal.character === 'kuromi' && <Kuromi className="w-6 h-6" />}
-                  {pal.character === 'cinnamo' && <Cinnamoroll className="w-6 h-5" />}
-                  {pal.character === 'pompom' && <Pompompurin className="w-6 h-6" />}
+                  {isGenshin ? (
+                    <Paimon className="w-6 h-6" />
+                  ) : (
+                    <>
+                      {pal.character === 'kitty' && <HelloKitty className="w-6 h-6" />}
+                      {pal.character === 'melody' && <MyMelody className="w-6 h-6" />}
+                      {pal.character === 'kuromi' && <Kuromi className="w-6 h-6" />}
+                      {pal.character === 'cinnamo' && <Cinnamoroll className="w-6 h-5" />}
+                      {pal.character === 'pompom' && <Pompompurin className="w-6 h-6" />}
+                    </>
+                  )}
 
                   <button
                     onClick={() => toggleMastered(card.id)}
