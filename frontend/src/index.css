@@ -89,6 +89,22 @@ html.dark body {
   box-shadow: 3px 3px 0px #09030f !important;
 }
 
+/* Force high contrast on any white container or button when in Dark / Kuromi Mode */
+.dark button.bg-white,
+.dark a.bg-white,
+.dark span.bg-white,
+.dark div.bg-white:not(.dark\:bg-kuromi-900):not(.dark\:bg-kuromi-800) {
+  background-color: #1e102e !important;
+  color: #f8fafc !important;
+}
+
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-slate-800,
+.dark .text-ink-900 {
+  color: #f1f5f9 !important;
+}
+
 /* Make notebook lines clearly legible in dark mode */
 .notebook-lined {
   background-color: #ffffff;
