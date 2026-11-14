@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 
 import { HelloKitty, MyMelody, Kuromi, Cinnamoroll, Pompompurin, CuteStar, CuteBow } from '../components/SanrioStickers';
+import { Paimon, Primogem, MoraCoin, EmergencyFoodBadge, TeyvatStar } from '../components/GenshinStickers';
 
 export default function Quiz({ 
   quiz, 
@@ -28,8 +29,10 @@ export default function Quiz({
   onSelectQuiz,
   onSelectMaterial,
   onSubmitQuiz, 
-  onCancel 
+  onCancel,
+  edition = 'genshin'
 }) {
+  const isGenshin = edition === 'genshin';
   const [selectedDeckId, setSelectedDeckId] = useState(activeMaterialId || (materials[0] ? materials[0].id : null));
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({});
@@ -64,29 +67,39 @@ export default function Quiz({
           <div className="absolute top-2 right-16 w-24 h-4 washi-tape-purple rotate-3 z-20 opacity-80 rounded-xs pointer-events-none" />
 
           {/* Header Banner */}
-          <div className="p-6 sm:p-7 bg-gradient-to-r from-kitty-100 via-melody-100 to-pompom-100 dark:from-kuromi-950 dark:via-kuromi-900 dark:to-kuromi-950 border-b-2 border-kitty-200 dark:border-kuromi-700 relative shrink-0 pt-7">
+          <div className={`p-6 sm:p-7 border-b-2 relative shrink-0 pt-7 ${
+            isGenshin 
+              ? 'bg-gradient-to-r from-amber-100 via-sky-100 to-indigo-100 dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 border-ink-900' 
+              : 'bg-gradient-to-r from-kitty-100 via-melody-100 to-pompom-100 dark:from-kuromi-950 dark:via-kuromi-900 dark:to-kuromi-950 border-kitty-200 dark:border-kuromi-700'
+          }`}>
             <div className="flex items-start justify-between">
               <div className="space-y-1.5 max-w-xl">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/90 dark:bg-kuromi-800 text-kitty-600 dark:text-kuromi-300 shadow-pop-sm border border-kitty-200 dark:border-kuromi-600 font-fredoka">
-                  <CuteBow className="w-4 h-4" />
-                  Product Management 2 • Master Case Quizzes
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-white/90 dark:bg-slate-800 text-amber-700 dark:text-amber-300 shadow-pop-sm border border-ink-900 font-fredoka">
+                  {isGenshin ? <Primogem className="w-4 h-4" /> : <CuteBow className="w-4 h-4" />}
+                  {isGenshin ? 'Teyvat Quest • 250 Primogem Quizzes' : 'Product Management 2 • Master Case Quizzes'}
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800 dark:text-white font-fredoka flex items-center gap-2">
-                  <span>Select Lecture PPT & Quiz Set</span>
-                  <CuteStar className="w-5 h-5 animate-spin-slow" />
+                  <span>{isGenshin ? 'Select Archon Deck & Topic Quest' : 'Select Lecture PPT & Quiz Set'}</span>
+                  {isGenshin ? <TeyvatStar className="w-5 h-5 text-amber-400 animate-spin-slow" /> : <CuteStar className="w-5 h-5 animate-spin-slow" />}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-quicksand font-bold">
-                  50 questions per lecture deck divided into 5 targeted topic sets (10 questions each) • 2 Easy, 2 Medium & 1 Hard set!
+                  {isGenshin 
+                    ? '50 questions per Archon deck divided into 5 targeted quest sets (10 questions each) • Earn Primogems for every correct answer!' 
+                    : '50 questions per lecture deck divided into 5 targeted topic sets (10 questions each) • 2 Easy, 2 Medium & 1 Hard set!'}
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="hidden sm:block">
-                  <MyMelody className="w-14 h-14 animate-bounce-gentle" />
+                  {isGenshin ? (
+                    <Paimon className="w-16 h-16 animate-cute-float" mood="excited" />
+                  ) : (
+                    <MyMelody className="w-14 h-14 animate-bounce-gentle" />
+                  )}
                 </div>
                 <button
                   onClick={onCancel}
-                  className="w-10 h-10 rounded-2xl bg-white dark:bg-kuromi-800 hover:bg-kitty-100 dark:hover:bg-kuromi-700 border-2 border-kitty-200 dark:border-kuromi-600 flex items-center justify-center text-slate-600 dark:text-slate-200 shadow-pop-sm transition font-bold"
+                  className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 hover:bg-amber-100 dark:hover:bg-slate-700 border-2 border-ink-900 flex items-center justify-center text-slate-600 dark:text-slate-200 shadow-pop-sm transition font-bold"
                   title="Close"
                 >
                   <X className="w-5 h-5" />
@@ -441,16 +454,18 @@ export default function Quiz({
             {!revealedHints[currentQ.id] ? (
               <button
                 onClick={toggleHint}
-                className="inline-flex items-center gap-2 text-xs font-black text-amber-800 dark:text-amber-300 bg-pompom-100 dark:bg-amber-950/50 hover:bg-pompom-200 border-2 border-pompom-300 dark:border-amber-700 px-3.5 py-2 rounded-xl transition shadow-pop-sm font-fredoka"
+                className="inline-flex items-center gap-2 text-xs font-black text-amber-800 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/50 hover:bg-amber-200 border-2 border-amber-400 dark:border-amber-700 px-3.5 py-2 rounded-xl transition shadow-pop-sm font-fredoka"
               >
-                <Pompompurin className="w-4 h-4 shrink-0" />
-                Need a study hint from Pompompurin? (Does not reveal answer)
+                {isGenshin ? <Paimon className="w-5 h-5 shrink-0" mood="excited" /> : <Pompompurin className="w-4 h-4 shrink-0" />}
+                {isGenshin ? "Need a study hint from Paimon? (Does not reveal answer)" : "Need a study hint from Pompompurin? (Does not reveal answer)"}
               </button>
             ) : (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-pompom-100 to-amber-100 dark:from-amber-950/60 dark:to-orange-950/40 border-2 border-pompom-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 text-xs leading-relaxed flex items-start gap-3 shadow-pop font-quicksand">
-                <Pompompurin className="w-6 h-6 shrink-0 mt-0.5" />
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-100 to-sky-100 dark:from-slate-900 dark:to-indigo-950 border-2 border-amber-400 dark:border-amber-700 text-amber-950 dark:text-amber-200 text-xs leading-relaxed flex items-start gap-3 shadow-pop font-quicksand">
+                {isGenshin ? <Paimon className="w-7 h-7 shrink-0 mt-0.5" mood="happy" /> : <Pompompurin className="w-6 h-6 shrink-0 mt-0.5" />}
                 <div>
-                  <div className="font-black text-amber-950 dark:text-amber-300 uppercase tracking-wide text-[10px] mb-0.5 font-fredoka">Strategic Hint</div>
+                  <div className="font-black text-amber-950 dark:text-amber-300 uppercase tracking-wide text-[10px] mb-0.5 font-fredoka">
+                    {isGenshin ? "Paimon's Strategic Hint 💡" : "Strategic Hint"}
+                  </div>
                   {currentQ.hint}
                 </div>
               </div>

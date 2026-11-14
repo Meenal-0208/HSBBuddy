@@ -59,6 +59,29 @@ export default function App() {
     }
   });
 
+  // Theme Edition State (Genshin Impact / Paimon vs Sanrio) with LocalStorage persistence
+  const [edition, setEdition] = useState(() => {
+    try {
+      const saved = localStorage.getItem('study_buddy_edition');
+      if (saved) return saved;
+      return 'genshin'; // Default to Genshin Impact with Paimon as website logo
+    } catch {
+      return 'genshin';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('study_buddy_edition', edition);
+    } catch (e) {
+      console.warn("Could not save edition preference:", e);
+    }
+  }, [edition]);
+
+  const toggleEdition = () => {
+    setEdition(prev => prev === 'genshin' ? 'sanrio' : 'genshin');
+  };
+
   useEffect(() => {
     try {
       localStorage.setItem('study_buddy_dark_mode', JSON.stringify(isDarkMode));
@@ -408,6 +431,8 @@ export default function App() {
         subjectName={subjectName} 
         isDarkMode={isDarkMode}
         onToggleDarkMode={toggleDarkMode}
+        edition={edition}
+        onToggleEdition={toggleEdition}
       />
 
       {/* Global Error Toast */}
@@ -430,6 +455,7 @@ export default function App() {
             onNavigate={setActivePage} 
             onSelectMaterial={handleSelectMaterial}
             onStartQuiz={handleStartQuiz}
+            edition={edition}
           />
         )}
 
@@ -472,6 +498,7 @@ export default function App() {
               const m = materials.find(x => x.id === id);
               if (m) handleGenerateNotes(m);
             }}
+            edition={edition}
           />
         )}
 
@@ -485,6 +512,7 @@ export default function App() {
             onSelectMaterial={(id) => handleStartQuiz(id)}
             onSubmitQuiz={handleSubmitQuiz}
             onCancel={() => setActivePage('dashboard')}
+            edition={edition}
           />
         )}
 
@@ -502,12 +530,15 @@ export default function App() {
             attemptsHistory={progressData.recent_attempts}
             revisionQueue={progressData.revision_items}
             onStartRevisionQuiz={() => handleStartQuiz('revision')}
+            edition={edition}
           />
         )}
       </main>
 
       <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 py-4 text-center text-xs text-slate-400 dark:text-slate-500 transition-colors">
-        Personal AI Study Buddy • Single-Subject Dedicated Workspace • Private Local Storage
+        {edition === 'genshin' 
+          ? "Paimon Study Buddy • Genshin Impact Teyvat Edition • Single-Subject Dedicated Workspace" 
+          : "Sanrio Study Buddy • Single-Subject Dedicated Workspace • Private Local Storage"}
       </footer>
     </div>
   );

@@ -31,11 +31,21 @@ import {
   PopStamp 
 } from '../components/SanrioStickers';
 
+import { 
+  Paimon, 
+  Primogem, 
+  MoraCoin, 
+  EmergencyFoodBadge, 
+  TeyvatStar 
+} from '../components/GenshinStickers';
+
 export default function Progress({ 
   attemptsHistory = [], 
   revisionQueue = [], 
-  onStartRevisionQuiz 
+  onStartRevisionQuiz,
+  edition = 'genshin'
 }) {
+  const isGenshin = edition === 'genshin';
   const [filterDeck, setFilterDeck] = useState('all');
 
   const totalAttempts = attemptsHistory.length;
@@ -59,37 +69,59 @@ export default function Progress({
       <div className="washi-tape-mint absolute -top-4 right-14 w-28 h-5 rotate-[2deg] rounded-sm pointer-events-none z-10 hidden sm:block" />
 
       {/* Header Banner */}
-      <div className="relative bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 dark:from-kuromi-900 dark:via-purple-950 dark:to-slate-900 p-7 sm:p-9 rounded-3xl border-3 border-ink-900 shadow-pop flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden">
+      <div className={`relative p-7 sm:p-9 rounded-3xl border-3 border-ink-900 shadow-pop flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden ${
+        isGenshin 
+          ? 'bg-gradient-to-r from-amber-100 via-sky-100 to-indigo-100 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900' 
+          : 'bg-gradient-to-r from-purple-100 via-pink-100 to-yellow-100 dark:from-kuromi-900 dark:via-purple-950 dark:to-slate-900'
+      }`}>
         <div className="washi-tape-striped absolute -top-1 left-12 w-32 h-5 rotate-[-2deg] rounded-sm pointer-events-none z-20" />
         
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <PopStamp text="STUDY SCORECARD" color="border-purple-600 text-purple-700 bg-white" rotate="-rotate-2" />
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-kuromi-800 text-ink-900 dark:text-white border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
-              <Trophy className="w-4 h-4 text-amber-500" />
-              Recall Mastery & Log
+            <PopStamp 
+              text={isGenshin ? "ADVENTURER SCORECARD" : "STUDY SCORECARD"} 
+              color={isGenshin ? "border-amber-600 text-amber-700 bg-amber-50" : "border-purple-600 text-purple-700 bg-white"} 
+              rotate="-rotate-2" 
+            />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-slate-800 text-ink-900 dark:text-white border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
+              {isGenshin ? <Primogem className="w-4 h-4" /> : <Trophy className="w-4 h-4 text-amber-500" />}
+              {isGenshin ? "Primogem Bounty & Rank" : "Recall Mastery & Log"}
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 dark:bg-kuromi-800 text-kitty-600 dark:text-melody-300 border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 dark:bg-slate-800 text-amber-800 dark:text-amber-200 border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
               <Flame className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
               5 Day Streak
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-fredoka font-black tracking-tight text-ink-900 dark:text-white">
-            Performance Scorecard & Retention Log
+          <h1 className="text-3xl sm:text-4xl font-fredoka font-black tracking-tight text-ink-900 dark:text-white flex items-center gap-2">
+            <span>{isGenshin ? "Adventurer Scorecard & Primogem Vault" : "Performance Scorecard & Retention Log"}</span>
+            {isGenshin && <TeyvatStar className="w-5 h-5 text-amber-400" />}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-700 dark:text-melody-100 mt-1 max-w-xl leading-relaxed font-bold font-quicksand">
-            Live record of every quiz session taken across your 5 Product Management decks. Track score improvements, review missed concept tags, and master weak areas with Kuromi!
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 mt-1 max-w-xl leading-relaxed font-bold font-quicksand">
+            {isGenshin 
+              ? "Live record of all quest expeditions taken across your 5 Product Management decks. Earn Primogems, review missed concept tags, and level up your PM Adventurer Rank with Paimon!" 
+              : "Live record of every quiz session taken across your 5 Product Management decks. Track score improvements, review missed concept tags, and master weak areas with Kuromi!"}
           </p>
         </div>
 
         {/* Lifetime Mastery Badge */}
-        <div className="flex items-center gap-4 bg-white dark:bg-kuromi-800 p-5 rounded-3xl border-2 border-ink-900 shadow-pop shrink-0">
-          <Cinnamoroll className="w-14 h-10 animate-cute-float" />
+        <div className="flex items-center gap-4 bg-white dark:bg-slate-800 p-5 rounded-3xl border-2 border-ink-900 shadow-pop shrink-0">
+          {isGenshin ? (
+            <Paimon className="w-16 h-16 animate-cute-float" mood="excited" />
+          ) : (
+            <Cinnamoroll className="w-14 h-10 animate-cute-float" />
+          )}
           <div>
-            <div className="text-3xl font-fredoka font-black text-ink-900 dark:text-white">{avgScore}%</div>
-            <div className="text-xs font-bold text-sky-600 dark:text-sky-400 font-fredoka">Average Score</div>
-            <div className="text-[10px] text-slate-500 font-quicksand font-bold mt-0.5">{accuracyRate}% Pass Rate</div>
+            <div className="text-3xl font-fredoka font-black text-ink-900 dark:text-white flex items-center gap-1">
+              <span>{avgScore}%</span>
+              {isGenshin && <Primogem className="w-5 h-5" />}
+            </div>
+            <div className="text-xs font-bold text-amber-600 dark:text-amber-400 font-fredoka">
+              {isGenshin ? "Archon Mastery" : "Average Score"}
+            </div>
+            <div className="text-[10px] text-slate-500 font-quicksand font-bold mt-0.5">
+              {isGenshin ? "+1,280 Primogems Earned" : `${accuracyRate}% Pass Rate`}
+            </div>
           </div>
         </div>
       </div>

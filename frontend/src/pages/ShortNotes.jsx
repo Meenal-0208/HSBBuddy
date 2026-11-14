@@ -27,6 +27,15 @@ import {
   PopStamp 
 } from '../components/SanrioStickers';
 
+import {
+  Paimon,
+  Primogem,
+  MoraCoin,
+  EmergencyFoodBadge,
+  TeyvatStar,
+  PaimonDialogue
+} from '../components/GenshinStickers';
+
 const DECK_PALETTES = {
   'pm2-day1': {
     character: 'kitty',
@@ -85,8 +94,10 @@ export default function ShortNotes({
   notesData = {}, 
   activeMaterialId, 
   onSelectMaterial, 
-  onStartQuiz
+  onStartQuiz,
+  edition = 'genshin'
 }) {
+  const isGenshin = edition === 'genshin';
   const [copiedId, setCopiedId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeDeckTab, setActiveDeckTab] = useState('all'); // 'all' or matId
@@ -150,29 +161,48 @@ export default function ShortNotes({
 
   return (
     <div className="space-y-6">
+      {/* Paimon Study Tip Dialogue if Genshin Mode */}
+      {isGenshin && (
+        <PaimonDialogue 
+          subtext="Paimon's Visual Study Guide"
+          message="Paimon gathered all 26 revision topics across your 5 Product Management decks! Review the breakdown notes below to easily master your PM exam!"
+        />
+      )}
+
       {/* Header Banner */}
-      <div className="relative bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100 dark:from-kuromi-900 dark:via-purple-950 dark:to-slate-900 p-6 sm:p-8 rounded-3xl border-3 border-ink-900 shadow-pop flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden">
+      <div className={`relative p-6 sm:p-8 rounded-3xl border-3 border-ink-900 shadow-pop flex flex-col md:flex-row md:items-center justify-between gap-6 overflow-hidden ${
+        isGenshin 
+          ? 'bg-gradient-to-r from-amber-50 via-sky-50 to-indigo-100 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900' 
+          : 'bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100 dark:from-kuromi-900 dark:via-purple-950 dark:to-slate-900'
+      }`}>
         <div className="washi-tape-striped absolute -top-1 left-12 w-32 h-5 rotate-[-2deg] rounded-sm pointer-events-none z-20" />
         <div className="washi-tape-mint absolute -top-1 right-20 w-28 h-5 rotate-[3deg] rounded-sm pointer-events-none z-20" />
         
         <div>
           <div className="flex items-center gap-2 mb-2 flex-wrap">
-            <PopStamp text="HIGH-YIELD REVISION NOTES" color="border-pink-600 text-pink-700 bg-white" rotate="-rotate-2" />
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-kuromi-800 text-ink-900 dark:text-white border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
-              <MyMelody className="w-4 h-4" />
+            <PopStamp 
+              text={isGenshin ? "TEYVAT REVISION SCROLLS" : "HIGH-YIELD REVISION NOTES"} 
+              color={isGenshin ? "border-amber-600 text-amber-700 bg-amber-50" : "border-pink-600 text-pink-700 bg-white"} 
+              rotate="-rotate-2" 
+            />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white dark:bg-slate-800 text-ink-900 dark:text-white border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
+              {isGenshin ? <Paimon className="w-4 h-4" /> : <MyMelody className="w-4 h-4" />}
               {allCards.length} Revision Topics
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border-2 border-ink-900 text-xs font-fredoka font-black shadow-pop-sm">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+              {isGenshin ? <Primogem className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
               {masteredCards.size} Mastered
             </span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-fredoka font-black tracking-tight text-ink-900 dark:text-white">
-            Visual Revision Notes
+          <h1 className="text-3xl sm:text-4xl font-fredoka font-black tracking-tight text-ink-900 dark:text-white flex items-center gap-2">
+            <span>{isGenshin ? "Paimon's Visual Revision Notes" : "Visual Revision Notes"}</span>
+            {isGenshin && <TeyvatStar className="w-5 h-5 text-amber-400" />}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-700 dark:text-melody-100 mt-1 max-w-xl leading-relaxed font-bold font-quicksand">
-            All summary notes, system architecture lifecycles, and bullet breakdowns displayed directly across your 5 uploaded lecture PPT decks. No clicking or flipping needed!
+          <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-200 mt-1 max-w-xl leading-relaxed font-bold font-quicksand">
+            {isGenshin 
+              ? "All summary notes, system architecture lifecycles, and bullet breakdowns curated by Paimon directly across your 5 uploaded lecture PPT decks!" 
+              : "All summary notes, system architecture lifecycles, and bullet breakdowns displayed directly across your 5 uploaded lecture PPT decks. No clicking or flipping needed!"}
           </p>
         </div>
 
