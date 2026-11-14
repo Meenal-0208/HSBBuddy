@@ -267,19 +267,31 @@ export default function App() {
         return;
       }
 
-      // Check if param is a direct quiz ID (check if it exists in allQuizzes)
-      const foundDirect = allQuizzes.find(q => q.id === param);
+      // Check if param is a direct quiz ID (check if it exists in allQuizzes or MOCK_DATA.quizzes)
+      const foundDirect = (allQuizzes || []).find(q => q.id === param) || (MOCK_DATA.quizzes || []).find(q => q.id === param);
       if (foundDirect) {
-        const fullQuiz = await fetchQuiz(param).catch(() => foundDirect);
+        let fullQuiz = foundDirect;
+        try {
+          const fetched = await fetchQuiz(param);
+          if (fetched && fetched.questions && fetched.questions.length > 0) fullQuiz = fetched;
+        } catch {}
         setActiveQuiz(fullQuiz);
         setActivePage('quiz');
         return;
       }
 
       // If param is a materialId, fetch quizzes for that material
+      const existingInMock = (allQuizzes || []).filter(q => q.materialId === param || q.material_id === param)
+        .concat((MOCK_DATA.quizzes || []).filter(q => q.materialId === param || q.material_id === param));
+
+      if (existingInMock && existingInMock.length > 0) {
+        setActiveQuiz(existingInMock[0]);
+        setActivePage('quiz');
+        return;
+      }
+
       const existingList = await fetchQuizzes(param).catch(() => []);
       if (existingList && existingList.length > 0) {
-        // fetch the full quiz with questions
         quizRes = await fetchQuiz(existingList[0].id).catch(() => existingList[0]);
       } else {
         quizRes = await generateQuiz(param, 'single', 10);

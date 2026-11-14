@@ -52,7 +52,8 @@ export default function Quiz({
     const activeDeck = materials.find(m => m.id === selectedDeckId) || materials[0];
     const activeDeckIdx = materials.findIndex(m => m.id === (activeDeck ? activeDeck.id : null));
     const deckTheme = deckThemes[Math.max(0, activeDeckIdx) % deckThemes.length];
-    const deckQuizzes = quizzes.filter(q => q.material_id === (activeDeck ? activeDeck.id : null));
+    const activeId = activeDeck ? activeDeck.id : null;
+    const deckQuizzes = quizzes.filter(q => (q.materialId === activeId) || (q.material_id === activeId) || (q.materialId === selectedDeckId) || (q.material_id === selectedDeckId));
 
     return (
       <div className="fixed inset-0 z-50 bg-kitty-950/70 dark:bg-kuromi-950/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-300">
