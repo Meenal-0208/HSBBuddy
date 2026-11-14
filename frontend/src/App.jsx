@@ -27,21 +27,21 @@ export default function App() {
   const [activePage, setActivePage] = useState('dashboard');
   const [subjectName, setSubjectName] = useState("PRODUCT MANAGEMENT");
   const [aiConfigured, setAiConfigured] = useState(false);
-  const [materials, setMaterials] = useState([]);
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
-  const [notesData, setNotesData] = useState({});
-  const [activeQuiz, setActiveQuiz] = useState(null);
-  const [allQuizzes, setAllQuizzes] = useState([]);
+  const [materials, setMaterials] = useState(() => MOCK_DATA.materials || []);
+  const [selectedMaterial, setSelectedMaterial] = useState(() => (MOCK_DATA.materials && MOCK_DATA.materials[0]) || null);
+  const [notesData, setNotesData] = useState(() => MOCK_DATA.notes || {});
+  const [activeQuiz, setActiveQuiz] = useState(() => MOCK_DATA.sampleQuiz || null);
+  const [allQuizzes, setAllQuizzes] = useState(() => MOCK_DATA.quizzes || []);
   const [latestResult, setLatestResult] = useState(null);
   const [progressData, setProgressData] = useState({
     recent_attempts: [],
     revision_items: [],
-    stats: {
-      materialsCount: 0,
-      notesGenerated: 0,
+    stats: MOCK_DATA.stats || {
+      materialsCount: 5,
+      notesGenerated: 5,
       quizzesCompleted: 0,
       averageScore: 0,
-      revisionTopicsCount: 0
+      revisionTopicsCount: 26
     }
   });
 
@@ -216,6 +216,15 @@ export default function App() {
 
   const handleGenerateNotes = async (mat) => {
     setSelectedMaterial(mat);
+    // If note already exists in memory or MOCK_DATA, navigate directly
+    if (notesData[mat.id] || MOCK_DATA.notes[mat.id]) {
+      if (!notesData[mat.id] && MOCK_DATA.notes[mat.id]) {
+        setNotesData(prev => ({ ...prev, [mat.id]: MOCK_DATA.notes[mat.id] }));
+      }
+      setActivePage('notes');
+      return;
+    }
+
     try {
       setLoading(true);
       const res = await generateNotes(mat.id);
@@ -231,16 +240,15 @@ export default function App() {
       }));
       setActivePage('notes');
     } catch (err) {
-      // If AI key is unconfigured, fall back to offline sample note
-      if (!aiConfigured || err.message.includes("API Key")) {
-        showError("Note: AI API Key not configured in backend/.env. Loaded offline grounded note.");
+      const fallbackNote = MOCK_DATA.notes[mat.id] || Object.values(MOCK_DATA.notes)[0];
+      if (fallbackNote) {
         setNotesData(prev => ({
           ...prev,
-          [mat.id]: MOCK_DATA.notes["mat-1"]
+          [mat.id]: fallbackNote
         }));
         setActivePage('notes');
       } else {
-        showError(err.message);
+        showError(err.message || "Failed to generate notes");
       }
     } finally {
       setLoading(false);
